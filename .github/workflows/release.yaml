@@ -30,6 +30,7 @@ jobs:
         run: __tool/release.sh
 
       - name: Delete Release
+        continue-on-error: true
         run: gh release delete $VERSION
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
