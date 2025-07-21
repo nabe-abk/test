@@ -1,10 +1,11 @@
 name: Build and Release on Tag
 
 on:
-  push:
-    tags:
-      - 'v*'
-      - 'Ver*'
+  push: 
+    branches: main
+#    tags:
+#      - 'v*'
+#      - 'Ver*'
 
 permissions:
   contents: write
@@ -13,8 +14,8 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Archive Production Build
-        run: __tool/release.sh
+#      - name: Archive Production Build
+#        run: __tool/release.sh
 
       - name: Create Release
         run: gh release create ${{github.ref_name}}
