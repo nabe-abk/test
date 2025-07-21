@@ -17,16 +17,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Get Version String
+        run: echo "${{github.ref_name}}" | perl -e 'print "VERSION=" . <STDIN> =~ s/^.*?(\d+\.\d+(?:\.\d+)?\w*)/$1/r;' >> "$GITHUB_ENV"
+
+      - name: Check Version
+        run: |
+          if [ "$VERSION" = "" ]; then
+            echo "Version is not found!"
+            exit 99
+          fi
+
       - name: Build
         run: __tool/release.sh
 
       - name: Delete Release
-        run: gh release delete ${{github.ref_name}}
+        run: gh release delete $VERSION
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Create Release
-        run: gh release create ${{github.ref_name}} *.tar.bz2 *.zip
+        run: gh release create $VERSION *.tar.bz2 *.zip
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
