@@ -15,8 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-#      - name: Archive Production Build
-#        run: __tool/release.sh
+
+      - name: Build
+        run: __tool/release.sh
 
       - name: Create Release
         run: gh release create ${{github.ref_name}}
