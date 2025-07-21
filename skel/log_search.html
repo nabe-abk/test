@@ -1,0 +1,127 @@
+<$ifredirect(! Auth.isadmin, myself)>
+
+<$local(x)>
+<$constant(max_lines) = 10000>
+
+<!--=========================================================================-->
+<$v.title = "ログ検索">
+
+<@call("_sub/menu_tree")>
+
+<$ifset(!Query.sort, Query.sort, '-tm')>
+<$ifset(max_lines < Query.limit, Query.limit, max_lines)>
+
+
+<$local(logs, hits) = v.load_all_logs(Query)>
+<$local(tbl) = v.load_log_tbl_info()>
+<$local(types) = begin_array>
+	作成
+	編集
+	入金
+	削除
+<$end>
+
+<$local(users) = Auth.sudo('load_users', ['disable', 'pkey'])>
+
+<@>-----------------------------------------------------------------------------
+<article>
+<h2><@v.title></h2>
+<div class="body">
+
+	<div class="search">
+		<form method="GET">
+		<div class="iblocks">
+		<span class="iblock"><$x = Query.user>
+		<select name="user" class="js-on-change-submit slim">
+			<option value=""<@if(x eq '', ' selected')>>（ユーザー）</option>
+			<@foreach(local(t), users)>
+			<option value="<@t.pkey>"<@if(x eq t.pkey, ' selected')>><@t.name></option>
+			<$end>
+		</select></span>
+
+		<span class="iblock"><$x = Query.tbl>
+		<select name="tbl" class="js-on-change-submit">
+			<option value=""<@if(x eq '', ' selected')>>（操作対象）</option>
+			<@foreach_hash(local(t), tbl)>
+			<option class="logtarget-<@t>" value="<@t.key>"<@if(x eq t.key, ' selected')>><@t.val></option>
+			<$end>
+		</select></span>
+
+		<span class="iblock"><$x = Query.type>
+		<select name="type" class="js-on-change-submit">
+			<option class="normal" value=""<@if(x eq '', ' selected')>>（種別）</option>
+		<@foreach(local(t), types)>
+			<option class="logtype-<@t>" value="<@t>"<@if(x eq t, ' selected')>><@t></option>
+		<$end>
+		</select></span>
+
+		<select name="sort" class="js-on-change-submit"><$x = Query.sort>
+			<option value="tm" <@if(x eq 'tm',  ' selected')>>日時▲</option>
+			<option value="-tm"<@if(x eq '-tm', ' selected')>>日時▼</option>
+		</select></span>
+
+		<span class="iblock">
+			<input class="js-on-change-submit" type="date" max="9999-12-31" name="from_date" value="<@esc(Query.from_date)>">
+			～
+			<input class="js-on-change-submit" type="date" max="9999-12-31" name="to_date" value="<@esc(Query.to_date)>">
+		</span>
+		</div>
+
+		<div class="iblocks">
+		<span class="iblock">
+			<input class="num w80" type="number" name="limit" min="100" max="10000" step="100" value="<@int(Query.limit) || 100>">件
+		</span>
+		<span class="iblock">
+			<input id="q" class="w400" type="text" name="q" value="<@esc(Query._q)>"><button>検索</button>
+			<@ifexec(Query._q ne '', begin)>
+			<button id="clear">クリア</button>
+			<script type="module">
+				$('#clear').click(function(){ $('#q').val('') })
+			</script>
+			<$end>
+		</span>
+		</div>
+		</form>
+	</div>
+
+
+<@ifexec(@logs, begin)>
+	<$x = ##logs+1>
+	<@ifexec(x == hits)>
+		全 <@hits> 件表示
+	<$else>
+		<@x>件 / <@hits>件中
+	<$end>
+	<div class="table-container">
+	<table class="log"><thead>
+	<tr>
+		<th>日時</th>
+		<th>名前</th>
+		<th>対象</th>
+		<th>種類</th>
+		<th>内容</th>
+		<th class="ip">IP</th>
+		<th class="host">HOST</th>
+	</tr>
+	</thead>
+	<tbody>
+	<@foreach(local(t), logs)>
+	<tr>
+		<td class="nowrap date" title="<@t.pkey>"><@t.tm></td>
+		<td class="nowrap c" title="<@t.u_pkey>"><@t.name></td>
+		<td class="nowrap small"><span class="logtarget-<@t.target>"><@t.target></span> <a target="_blank" href="<@myself2><@t.link><@t.tbl_pkey>"><@t.tbl_pkey></a></td>
+		<td class="nowrap c logtype-<@t.type>"><@t.type></td>
+		<td class="log-msg"><@t.msg></td>
+		<td class="ip"><@t.ip></td>
+		<td class="host"><@t.host></td>
+	</tr>
+	<$end>
+	</tbody>
+	</table>
+	</div><!-- table-container -->
+<$end>
+
+	<p><label><input type="checkbox" class="js-switch" data-fast="1" data-target="table.log .ip, table.log .host">IP/HOSTを表示</label></p>
+
+</div>
+</article>

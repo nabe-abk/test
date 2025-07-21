@@ -1,0 +1,243 @@
+################################################################################
+LANG=ja_JP
+LC_NAME=日本語
+LC_WDAY=日, 月, 火, 水, 木, 金, 土
+LC_AMPM=午前, 午後
+LC_TIMESTAMP=%Y/%m/%d %H:%M:%S
+###############################################################################
+# Universal
+###############################################################################
+Operation not permitted.
+=権限がありません。
+
+%s() failed. Illegal arguments: %s
+=%s() に失敗しました。引数が正しくありません: %s
+
+Can't read file: %s
+=ファイルを読み込めません: %s
+
+Can't write file: %s
+=ファイルに書き込めません: %s
+
+Can't open file for %s: %s
+=ファイルを開けません（for %s）: %s
+
+Can't find host: %s
+=名前解決に失敗しました: %s
+
+Can't connect host: %s
+=ホストに接続できません: %s
+
+###############################################################################
+# Base.pm
+################################################################################
+[executor] Can't execute: %s
+=[executor] 実行できません: %s
+
+[executor] Too depth nested call() (max %d).
+=[executor] call()のネストが深すぎます（最大%d）。
+
+[executor] Too many jump() (max %d).
+=[executor] jump()の回数が多すぎます（最大%d）。
+
+%s() failed. File not found: %s
+=%s() に失敗しました。ファイルが見つかりません: %s
+
+Not allow characters are used in skeleton name: %s
+=スケルトンに使用できない文字が指定されています: %s
+
+################################################################################
+# Base_2.pm
+################################################################################
+Not allow multipart/form-data.
+=マルチパートフォームは許可されていません。
+
+Form data too large (max %.1fMB).
+=フォームデータが大きすぎます（最大 %.1fMB）。
+
+Form data '%s' is too long and has been limited to %d characters.
+=フォーム「%s」は長すぎるため、%d文字に制限されました。
+
+Failed to load multipart form.
+=マルチパートフォームの読み込みに失敗しました
+
+Create symbolic link error: "%s" to "%s"
+=シンボリックリンクの作成に失敗しました: "%s" to "%s"
+
+Failed to make directory: %s
+=ディレクトリの作成に失敗しました: %s
+
+Can't write temporary directory: %s
+=テンポラリディレクトリに書き込めません: %s
+
+Can't open temporary file: %s
+=テンポラリファイルが開けません: %s
+
+################################################################################
+# Auth_2.pm
+################################################################################
+Incorrect ID or password.
+=IDまたはパスワードが正しくありません。
+
+Too many failures. Please try again later.
+=ログインに失敗しすぎました。しばらく経ってから再度試してください。
+
+################################################################################
+# Auth_3.pm
+################################################################################
+Not found account: %s
+=アカウントが見つかりません: %s
+
+No assignment delete account.
+=削除アカウントが指定されていません。
+
+No login.
+=ログインしていません。
+
+Can't execute with 'root*'.
+=自動管理者ログイン(root*)では実行できません。
+
+Incorrect password.
+=パスワードが正しくありません。
+
+ID is empty.
+=IDが設定されていません。
+
+ID is incorrect: %s
+=IDが正しくありません。
+
+Too long ID (max %d characters): %s
+=ユーザーIDが長すぎます（最大%d文字）。
+
+ID already exists: %s
+=ID「%s」はすでに存在します。
+
+Name is empty.
+=名前が設定されていません。
+
+The name cannot contain ", \', <, >.
+=名前には「"」「'」「<」「>」を文字を使用できません。
+
+Too long name (max %d characters).
+=名前が長すぎます（最大%d文字）。
+
+Password is empty.
+=パスワードが設定されていません。
+
+password is ignore: %s
+=パスワードが簡単すぎます。
+
+Too short password (min %d characters).
+=パスワードが短すぎます（%d文字以上）。
+
+Mismatch password and retype password.
+=確認用パスワードが一致しません。
+
+E-mail is incorrect: %s
+=E-mailが正しくありません: %s
+
+'%s' cannot be used as extended columns.
+=「%s」は拡張カラム名として使用できません。
+
+################################################################################
+# Base/Compiler.pm
+################################################################################
+Unknown pragma: %s
+=未知のプラグマです: %s
+
+String format error: %s
+=文字列の書式が正しくありません: %s
+
+Command broken: %s
+=コマンドの書式が正しくありません: %s
+
+Syntax error: %s
+=文法エラー: %s
+
+Exists "%s" after "%s".
+=「%s」が「%s」の後にあります。
+
+Exists "%s" without "%s".
+=「%s」がありますが、対応する「%s」が見つかりません。
+
+Exists "%s" duplicate in "ifexec".
+=「ifexec」内の「%s」が複数あります。
+
+Illegal location for "%s".
+=「%s」が不正な場所に存在します。
+
+"%s" cannot be written in non-code blocks.
+=「%s」をコード以外のブロックに書くことはできません。
+
+"%s" is not allowed here.
+=「%s」はここでは使用できません。
+
+Not found "end" corresponding to "%s".
+=「%s」に対応する「end」か見つかりません。
+
+Skip the "end" corresponding to "begin_func" in the error line.
+=対応する「begin_func」行がエラーであるため「end」が無視されます。
+
+Unknown element: %s
+=未知の要素です: %s
+
+Strict mode not access to lowercase global variable: %s
+=Strictモードでは、小文字のグローバル変数にアクセスすることはできません: %s
+
+"%s" cannot be written inside an expression.
+=「%s」を式の内側に書くことはできません。
+
+Illegal local variable with constant: %s
+=ローカル変数宣言に定数が使用されています: %s
+
+Illegal local variable format.
+=ローカル変数の書式が不正です。
+
+Illegal local variable name: %s
+=ローカル変数名が不正です: %s
+
+This name is reserved: %s
+=この名前は予約されています: %s
+
+This name is already used as a constant: %s
+=定数としてすでに使用されています: %s
+
+Duplicate variable name in one local(): %s
+=ひとつのローカル変数宣言内で名前が重複しています: %s
+
+Illegal constant format.
+=定数の書式が不正です。
+
+Already used as a local variable: %s
+=ローカル変数名としてすでに使用されています: %s
+
+Few many arguments: %s
+=引数が多すぎます: %s
+
+Illegal arguments: %s
+=引数が正しくありません: %s
+
+"%s" must have one argument.
+=「%s」には引数がひとつだけ必要です。
+
+Can't be used in strict mode: %s
+=Strictモードでは使用できません: %s
+
+Requires loop variable as first argument: %s
+=最初の引数としてループ変数が必要です: %s
+
+%d-th's argument must be strings or variable or constant: %s
+=%d番目の引数は「文字列」か「変数」か「定数」でなければなりません: %s
+
+Illegal function: %s
+=関数の記述が正しくありません: %s
+
+Illegal hash format: %s (in %s)
+=ハッシュの記述形式が正しくありません: %s (in %s)
+
+Duplicate hash key: %s (in %s)
+=ハッシュキーが重複しています: %s (in %s)
+
+Variables cannot be used as keys in ordered hash: %s
+=順序付きハッシュのキーには変数を使用できません: %s
+

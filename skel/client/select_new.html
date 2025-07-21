@@ -1,0 +1,34 @@
+
+<$v.title ="取引先の新規登録">
+
+<$local(h) = {}>
+<$ifset(Query.ctype eq 'buy',  h.for_buy,  1)>
+<$ifset(Query.ctype eq 'sale', h.for_sale, 1)>
+
+<!--=========================================================================-->
+<article>
+<h2><@v.title></h2>
+<div class="body">
+
+	<form id="form" class="js-ajax no-enter-submit">
+	<input type="hidden" name="action" value="_ajax_add_client">
+
+	<@call("<@v.skel_dir>_form", h)>
+
+	<div>
+		<button type="button" data-href="<@myself2><@v.skel_dir>select?<@make_query_amp()>">戻る</button>
+		<button type="submit">追加する</button>
+	</div>
+	</form>
+
+</div>
+</article>
+
+
+<script type="module">
+	$('#form').data('success', function(h){
+		if (window.opener) window.opener.selected_client(h.data);
+		window.close();
+	});
+</script>
+

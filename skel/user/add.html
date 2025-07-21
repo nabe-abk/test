@@ -1,0 +1,26 @@
+<$local(t)>
+
+<@>権限確認
+<$ifredirect(! Auth.isadmin, myself)>
+
+<!--=========================================================================-->
+<$v.title="ユーザー追加">
+
+<@call("_sub/menu_tree")>
+
+<!--=========================================================================-->
+<article>
+<h2><@v.title></h2>
+<div class="body">
+	<form class="js-ajax" data-url="<@Basepath><@v.skel_dir>">
+	<input type="hidden" name="action" value="user__ajax_add">
+	<@ifexec(Auth.auto, begin)>
+	<p><strong class="warning">最初に管理者ユーザを追加します。</strong></p>
+	<$end>
+
+	<@call( v.skel_dir . '_form')>
+
+	<button type="submit">ユーザーを追加する</button>
+	</form>
+</div>
+</article>

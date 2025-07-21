@@ -1,0 +1,924 @@
+@charset "UTF-8";
+/*--------------------------------------------------------------------
+●定義
+--------------------------------------------------------------------*/
+:root {
+	--main-font-size:	12pt;
+	--sub-font-size:	11pt;
+	--list-font-size:	10.5pt;
+	--log-font-size:	10pt;
+	--small-font-size:	9pt;
+}
+
+/*--------------------------------------------------------------------
+●メイン配置
+--------------------------------------------------------------------*/
+* {
+	box-sizing:		border-box;
+}
+html {
+	margin-top:		0;
+	font-size:		var(--main-font-size);
+	line-height:		1.5;
+	min-height:		100%;
+}
+
+header {
+	position:		absolute;
+	font-size:		var(--small-font-size);
+	right:			4px;
+	top:			0;
+}
+
+body {
+	background-image:	linear-gradient(to bottom,
+				rgb(240,240,250),
+				rgb(197,215,255));
+	margin:			0;
+	padding:		0;
+}
+
+h1
+{
+	font-size:		20pt;
+	font-weight:		normal;
+	line-height:		100%;
+	border-bottom:		2px solid #6b75b8;
+	padding:		0 0.5em;
+	margin:			calc(var(--small-font-size)*1.6) 0 0 0;
+}
+h1 a,
+h1 a:link,
+h1 a:visited {
+	color:			inherit;
+	text-decoration:	none;
+}
+#main {
+	margin:			1em;
+}
+
+#footer
+{
+	border-top:		2px solid #6b75b8;
+	text-align:		right;
+	margin:			1.5em 0 0.6em 0;
+	padding:		0 1em;
+	font-size:		var(--small-font-size);
+	line-height:		120%;
+}
+
+/*--------------------------------------------------------------------
+●開発用デザイン
+--------------------------------------------------------------------*/
+body.develop {
+	background-image:	linear-gradient(to bottom, #fee, #e1c2b8);
+}
+body.develop h1 {
+	color:			#e00;
+}
+
+/*--------------------------------------------------------------------
+●基本
+--------------------------------------------------------------------*/
+a:link, a:visited {
+	color:			#04c;
+}
+
+p {
+	text-indent:		1em;
+}
+p.ni {
+	text-indent:		0;
+}
+
+.error {
+	background-color:	#fee;
+}
+
+.hide {
+	display:		none;
+}
+
+/*--------------------------------------------------------------------
+●メニューツリー
+--------------------------------------------------------------------*/
+nav.tree, nav.tree select {
+	font-size:		var(--small-font-size);
+}
+
+nav.tree {
+	line-height:		130%;
+	display:		block;
+
+	border:			1px solid rgb(94,100,150);
+	margin-bottom:		1.5em;
+	padding:		0.5em 1em 0.5em 1.5em;
+
+	background-color:	#fff;
+}
+
+ul.main-menu {
+	line-height:		2;
+}
+
+/*--------------------------------------------------------------------
+●本文
+--------------------------------------------------------------------*/
+article {
+	background-color:	#fafafa;
+	border:			2px solid rgb(94,100,150);
+	margin:			10px 0;
+	border-radius:		10px;
+}
+article h2::before,
+article h3::before {
+	border:			6px solid #236270;
+	border-radius:		6px;
+	content:		"";
+	display:		inline-block;
+	height:			0;
+	margin-right:		2px;
+	margin-left:		16px;
+}
+article h2.js-switch::before {
+	border:			none;
+	margin-left:		12px;
+}
+article h2, article h3 {
+	font-size:		120%;
+	margin-top:		8px;
+	margin-bottom:		0.5em;
+}
+article h2::after {
+	display:		block;
+	content:		"";
+	height:			3px;
+	margin:			0 12px;
+	background-image:	linear-gradient(to right,
+				#233370,	/* $c=main */
+				#fff);
+}
+article h3::before {
+	margin-left:		0px;
+}
+article h3 {
+	margin:			1em 0;
+	font-size:		100%;
+}
+
+article div.body {
+	margin:			0.5em 1em;
+}
+
+/*--------------------------------------------------------------------
+●書類表示の画面配置
+--------------------------------------------------------------------*/
+.view-box {
+	display:	flex;
+}
+.view-left {
+	min-width:	440px;
+	width:		440px;
+}
+.view-right {
+	flex-grow:	1;
+	max-height:	800px;
+}
+@media screen and (max-width: 880px) {
+	.view-left {
+		min-width:	340px;
+		width:		min(calc(100%/2), 340px);
+	}
+}
+
+.view-left div.table-container {
+	margin:		0 0 1em 1em;
+	width:		calc(100% - 2em);
+}
+.view-left div.table-container table {
+	width:		100%;
+}
+
+.view-left table th {
+	padding-left:	2px;
+	padding-right:	2px;
+}
+#view-file:has(*) {
+	border:		2px solid #00c;
+	max-width:	100%;
+}
+#view-file object {
+	width:		100%;
+	height:		100%;
+}
+#view-file:has(textarea) {
+	overflow-y:	hidden;
+	width:		auto;
+}
+#view-file textarea {
+	display:	block;
+	width:		100%;
+	height:		100%;
+	margin:		0;
+}
+#view-file:has(img) {
+	overflow-y:	auto;
+}
+#view-file img {
+	display:	block;
+	width:		100%;
+	max-height:	200%;
+	margin:		0;
+	object-fit:	contain;
+}
+
+#tbody-documents span.doc-filename {
+	font-size:	var(--small-font-size);
+}
+#tbody-documents button {
+	margin-left:	4px;
+	padding:	3px;
+}
+#tbody-documents button + button {
+	margin-left:	2px;
+}
+
+/*--------------------------------------------------------------------
+●テーブルデザイン
+--------------------------------------------------------------------*/
+div.table-container {
+	margin:			1em;
+	overflow-x:		auto;
+}
+table {
+	border-collapse:	collapse;
+	empty-cells:		show;
+	border:			1px solid #bbb;
+	border-radius:		4px;
+}
+table.list {
+	font-size:		var(--list-font-size);
+}
+th {
+	font-size:		var(--sub-font-size);
+}
+
+td.date {
+	font-size:		90%;
+	text-align:		center;
+}
+td.title {
+	font-size:		90%;
+}
+td.price {
+	text-align:		right;
+}
+
+td.memo {
+	min-width:		300px;
+}
+td.memo:before {
+	content:		"";
+	display:		block;
+	float:			left;
+	height: 		2em;
+}
+td.memo:has(textarea) {
+	padding:		0;
+}
+textarea.memo {
+	width:			100%;
+}
+span.paid-ymd {
+	margin-right:		1em;
+}
+
+td.noborder {
+	border-left:		none;
+	border-right:		none;
+}
+
+table.list  tr:hover:not(.nohover) td:not([rowspan]),
+table.log   tr:hover:not(.nohover) td:not([rowspan]),
+tbody.files tr:hover:not(.nohover) td:not([rowspan]) {
+	background-color:	#ffd;
+}
+
+/*--------------------------------------------------------------------
+●配色
+--------------------------------------------------------------------*/
+th {
+	background-color:	#b1c2ff;
+}
+td {
+	background-color:	#e8f1ff;
+}
+
+/*--------------------------------------------------------------------
+●配置
+--------------------------------------------------------------------*/
+.l	{
+	text-align:	left;
+}
+.c	{
+	text-align:	center;
+}
+.r	{
+	text-align:	right;
+}
+
+/*--------------------------------------------------------------------
+●フォームテーブル
+--------------------------------------------------------------------*/
+form {
+	padding:		0px;
+	margin:			0px;
+}
+form + form:not(.slim) {
+	margin-top:		2em;
+}
+div.checkbox {
+	margin:			1em 0 1em 1em;
+}
+table.form {
+	min-width:		600px;
+}
+td:has(table.sub) {
+	padding:		0;
+}
+table.sub {
+	margin:			-1px;
+	width:			calc(100% + 2px);
+	border:			none;
+}
+td, th {
+	padding:		2px;
+	border:			1px solid #697ed0;
+	line-height:		1.2;
+}
+th {
+	padding:		4px 4px;
+}
+th.row {
+	line-height:		1;
+}
+td.error input,
+td.check.error input {
+	background-color:	#fff1f1;
+}
+td.check, td.button {
+	text-align:		center;
+	background-color:	#eaf7f7;
+}
+th.nowrap, td.nowrap {
+	white-space:		nowrap;
+}
+
+#body td.focus {
+	background-color:	#9e9;
+}
+
+table:not(.login) tr:has(input[required]) th {
+	color:			#a00;
+}
+
+table.log {
+	font-size:		var(--log-font-size);
+}
+td.log-msg {
+	white-space:		pre-line;
+}
+
+
+table.list button {
+	padding:		4px 2px;
+	margin:			0 1px;
+	vertical-align:		bottom;
+}
+
+/*--------------------------------------------------------------------
+●フォーム部品
+--------------------------------------------------------------------*/
+textarea {
+	display:		block;
+}
+textarea, select {
+	font-size:		var(--main-font-size);
+}
+
+input[readonly] {
+	color:			#000;
+	background-color:	#eef;
+	cursor:			default;
+	border-width:		1px;
+	border-color:		#ccc;
+}
+input[disabled] {
+	color:			#444;
+	background-color:	#ddd;
+}
+
+input:invalid:not([required]), 
+input.error, select.error,
+td:has(input[type="file"].error),
+td:has(input[type="hidden"].error) {
+	background-color:	#fee;
+}
+input.edit {
+	background-color:	#eef;
+}
+
+.num, input[type="number"], input.price {
+	text-align:		right;
+}
+input.nospin[type="number"],
+input.price[type="number"] {
+	appearance:		textfield;
+}
+
+input.no-ime,
+input[type="number"],
+input[type="tel"],
+input[type="ip"],
+input[type="email"],
+input[type="password"],
+input.date, input.num {
+	ime-mode:		disabled;
+}
+
+input[type="text"].date {
+	width:			100px;
+	text-align:		center;
+}
+
+input[type="checkbox"]:checked + span.hevy {
+	font-weight:		bold;
+	color:			#000;
+	padding:		0 2px;
+	border-bottom:		2px solid red;
+}
+
+#pay-table .pay-price {
+	display:		inline-block;
+}
+
+
+/* checkbox and radio vertical centering */
+input[type="checkbox"],
+input[type="radio"] {
+	margin-right:		2px;
+	font-size:		inherit;
+	height:			1em;
+	vertical-align:		calc(1em * -0.1);
+}
+/* Safari Hack */
+_::-webkit-full-page-media, _:future, input[type="checkbox"],
+_::-webkit-full-page-media, _:future, input[type="radio"] {
+	height:			1lh;
+}
+
+/* Chrome Hack for Android */
+@media screen and (-webkit-min-device-pixel-ratio: 0) and (min-resolution: .001dpcm) {
+	input[type="date"] {
+		min-width:	6em;
+		width:		auto;
+	}
+
+}
+
+/*--------------------------------------------------------------------
+●ボタンデザイン
+--------------------------------------------------------------------*/
+button {
+	padding:		4px 8px;
+	text-indent:		0;
+	line-height:		100%;
+	vertical-align:		middle;
+	font-family:		sans-serif;
+
+	cursor:			pointer;
+
+	color:			#f9f9f9;
+	font-weight:		bold;
+	border:			1px solid #7ea6b5;
+	border-radius:		6px;
+	background-image:	linear-gradient(to bottom, #8391ca, #5f73a1);
+}
+button:hover, button:focus
+{
+	border-radius:		6px;
+	cursor:			pointer;
+	background-image:	none;
+	background-color:	#859Ce6;
+}
+button:disabled
+{
+	color:			#666;
+	background-image:	none;
+	background-color:	#8892b3;
+}
+label {
+	user-select: none;
+}
+button.left-margin,
+button + button:not(.no-margin),
+button + label:not(.note), 
+label  + button,
+button + a {
+	margin-left:		1em;
+}
+button + a {
+	vertical-align:		middle;
+	font-size:		90%;
+}
+button:has(+ .note) {
+	margin-right:		0.5em;
+}
+.note {
+	display:		inline-block;
+	font-size:		var(--sub-font-size);
+}
+
+/*--------------------------------------------------------------------
+●検索フォーム
+--------------------------------------------------------------------*/
+div.search select,
+div.search input[type="text"],
+div.search input[type="search"] {
+	margin:			0 1px;
+}
+div.search button {
+	vertical-align:		middle;
+	position:		relative;
+	top:			-2px;
+}
+div.iblocks {
+	margin:			0.5em 0;
+}
+span.iblock {
+	display:		inline-block;
+}
+
+
+/*--------------------------------------------------------------------
+●カメラ関連
+--------------------------------------------------------------------*/
+#camera-view-box td {
+	padding:	0;
+}
+#camera-view {
+	display:	block;
+	width:		100%;
+}
+img.camera-thumbnail {
+	display:	inline-block;
+	max-width:	64px;
+	vertical-align: middle;
+}
+
+/*--------------------------------------------------------------------
+●エラー表示
+--------------------------------------------------------------------*/
+div.error,
+span.warning, span.error,
+p.warning, p.error, strong {
+	color:		#d30;
+}
+em {
+	font-style:	normal;
+	font-weight:	bold;
+}
+div.error, p.error, span.error  {
+	font-weight:	bold;
+}
+div.output-error, div.output-debug {
+	white-space:	pre-line;
+}
+
+/* ファイル重複警告 */
+div.file-duplicate {
+	font-size:	var(--small-font-size);
+	display:	none;
+}
+div.file-duplicate span.msg {
+	color:		red;
+}
+div.file-duplicate span.msg:after {
+	content:	":";
+}
+div.file-duplicate a {
+	margin-left:	1em;
+}
+
+/* debug用 */
+div.debug-box {
+	border:		1px solid #088;
+	margin:		1em;
+	white-space:	pre-line;
+
+	font-size:	var(--list-font-size);
+	line-height:	1.2;
+}
+
+/*--------------------------------------------------------------------
+●タグ
+--------------------------------------------------------------------*/
+span.tag {
+	display:		inline-block;
+	color:			#fff;
+	background-color:	#5e75ce;
+
+	font-size:		var(--sub-font-size);
+	line-height:		1;
+
+	padding:		4px 6px;
+	border-radius:		10px;
+}
+span.tag + span.tag {
+	margin-left:		1em;
+}
+
+table.list span.tag {
+	font-size:		var(--small-font-size);
+	padding:		3px 4px;
+	border-radius:		6px;
+}
+table.list span.tag + span.tag {
+	margin-left:		0.5em;
+}
+
+/*--------------------------------------------------------------------
+●特定ステータス
+--------------------------------------------------------------------*/
+option {
+	color:			#000;
+}
+.ctype-購入, select:has(option.ctype-購入:checked),
+.dtype-購入, select:has(option.dtype-購入:checked) {
+	color:			#080;
+}
+.ctype-販売, select:has(option.ctype-販売:checked),
+.dtype-販売, select:has(option.dtype-販売:checked) {
+	color:			#00f;
+}
+
+span.tag.tag-購入先 {
+	color:			#fff;
+	background-color:	#080;
+}
+span.tag.tag-販売先 {
+	color:			#fff;
+	background-color:	#00f;
+}
+
+.dformat-見積書, select:has(option.dformat-見積書:checked) {
+	color:			#00f;
+}
+.dformat-請求書, select:has(option.dformat-請求書:checked) {
+	color:			#f00;
+}
+.dformat-発注書, select:has(option.dformat-発注書:checked) {
+	color:			#080;
+}
+.dformat-納品書, select:has(option.dformat-納品書:checked) {
+	color:			#750;
+}
+.dformat-領収書, select:has(option.dformat-領収書:checked) {
+	color:			#c0c;
+}
+
+/* ログ */
+.logtype-作成, select:has(option.logtype-作成:checked) {
+	color:			#00f;
+}
+.logtype-編集, select:has(option.logtype-編集:checked) {
+	color:			#080;
+}
+.logtype-入金, select:has(option.logtype-入金:checked) {
+	color:			#900;
+}
+.logtype-削除, select:has(option.logtype-削除:checked) {
+	color:			#f00;
+}
+
+
+/*--------------------------------------------------------------------
+●その他デザイン
+--------------------------------------------------------------------*/
+span.documents-count {
+	margin-left:		2px;
+	font-weight:		bold;
+	color:			#c00;
+}
+span.documents-date {
+	color:			#c00;
+}
+td.tax-rate {
+	text-align:		right;
+}
+span.tax-rate {
+	margin-right:		2em;
+}
+span.tax-rate:has(input) {
+	margin-right:		1em;
+}
+
+td:has(span.tamper-check) {
+	position:		relative;
+}
+
+span.tamper-check {
+	font-weight:		bold;
+	display:		inline-block;
+	position:		absolute;
+	right:			0.5em;
+}
+span.ok {
+	color:			green;
+}
+span.fail {
+	color:			red;
+}
+
+/*--------------------------------------------------------------------
+●debug
+--------------------------------------------------------------------*/
+#debug-messages {
+	margin:			1em;
+	font-size:		90%;
+/*	font-family:		monospace;	*/
+}
+#debug-messages h2 {
+	margin-bottom:		0;
+	padding-bottom:		0;
+}
+
+#debug-messages strong {
+	color:			#000;
+}
+
+/*--------------------------------------------------------------------
+●サイズ指定
+--------------------------------------------------------------------*/
+.small { font-size: 90%; }
+
+.w20 { width: 20px; }
+.w30 { width: 30px; }
+.w40 { width: 40px; }
+.w50 { width: 50px; }
+.w60 { width: 60px; }
+.w70 { width: 70px; }
+.w80 { width: 80px; }
+.w90 { width: 90px; }
+.w100 { width: 100px; }
+.w120 { width: 120px; }
+.w140 { width: 140px; }
+.w160 { width: 160px; }
+.w200 { width: 200px; }
+.w240 { width: 240px; }
+.w280 { width: 280px; }
+.w300 { width: 300px; }
+.w320 { width: 320px; }
+.w360 { width: 360px; }
+.w400 { width: 400px; }
+.w440 { width: 440px; }
+.w480 { width: 480px; }
+.w500 { width: 500px; }
+.w520 { width: 520px; }
+.w560 { width: 560px; }
+.w600 { width: 600px; }
+.w640 { width: 640px; }
+.w700 { width: 700px; }
+.w800 { width: 800px; }
+
+.w80p { width:  80%; }
+.w90p { width:  90%; }
+.w95p { width:  95%; }
+.w100p{ width: 100%; box-sizing: border-box; }
+
+.mw200 { min-width: 200px; }
+.mw300 { min-width: 300px; }
+.mw400 { min-width: 400px; }
+
+
+/*--------------------------------------------------------------------
+●レスポンシブ設定
+--------------------------------------------------------------------*/
+.sp { display: none; }
+
+@media screen and (max-width: 800px) {
+	#pay-table .dtype,
+	#pay-table .dformat {
+		display:	none;
+	}
+}
+
+@media screen and (max-width: 600px) {
+	/* font size */
+	:root {
+		--main-font-size:	11pt;
+		--sub-font-size:	10pt;
+		--list-font-size:	9pt;
+		--log-font-size:	9pt;
+		--small-font-size:	8.5pt;
+	}
+
+	/* hide .nosp, show .sp */
+	.sp {
+		display:	revert;
+	}
+	.nosp {
+		display:	none;
+	}
+	.spFirstLetter {
+		font-size:	0.0001%;
+	}
+	.spFirstLetter::first-letter {
+		font-size:	100000000%;
+		line-height: 	1;
+	}
+
+	/* elements */
+	h1 {
+		padding-left:	4px;
+	}
+	#main {
+		margin-left:	4px;
+		margin-right:	4px;
+	}
+	article div.body {
+		margin-left:	8px;
+		margin-right:	8px;
+	}
+
+	.view-box {
+		display:	block;
+	}
+	.view-left {
+		width:		100%;
+		min-width:	0;
+	}
+	.view-left table {
+		margin-left:	0;
+		margin-right:	0;
+		width:		100%;
+	}
+	.view-right {
+		display:	none;
+	}
+	div.table-container,
+	.view-left div.table-container {
+		margin-left:	0;
+		margin-right:	0;
+		width:		100%;
+	}
+	table.form {
+		width:		100%;
+		min-width:	0;
+	}
+
+	button {
+		padding-left:	4px;
+		padding-right:	4px;
+	}
+
+	#pay-table span.pay-date,
+	#pay-table span.pay-price {
+		display: 	block;
+		text-align:	right;
+	}
+
+	.w300, .w320, .w360,
+	.w400, .w440, .w480,
+	.w500, .w520, .w560,
+	.w600, .w640,
+	.w700, .w800 {
+		width: 100%;
+	}
+	.mw200, .mw300, .mw400 {
+		min-width: 0;
+	}
+
+	table:has(
+		input.w300, input.w320, input.w360,
+		input.w400, input.w440, input.w480,
+		input.w500, input.w520, input.w560,
+		input.w600, input.w640,
+		input.w700, input.w800
+	) {
+		width: 100%;
+	}
+	div.search input[type="text"] {
+		width: 140px;
+	}
+	div.search input.num.w80 {
+		width: 60px;
+	}
+	div.search input.price {
+		width: 80px;
+	}
+	div.iblocks {
+		line-height:	2;
+	}
+}
+

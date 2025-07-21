@@ -1,0 +1,55 @@
+<$local(h)  = argv#0 || {}>
+<$local(id) = h.id>
+
+<div class="table-container">
+<table>
+	<tr>
+		<th>ID</th>
+	<@ifexec(id ne '')>
+		<td title="<@h.pkey>"><input type="hidden" name="id" value="<@h.id>"><@h.id>（変更不可）</td>
+	<$else>
+		<td><input type="text" name="msys_id" class="w100" value="" data-name="id" pattern="^[a-z][a-z0-9_]*$" required>
+			先頭"a-z"。"a-z, 0-9, _" のみ使用可
+		</td>
+	<$end>
+	</tr>
+	<tr>
+		<th>名前</th>
+		<td><input type="text" name="name" class="w160" value="<@h.name>" required></td>
+	</tr>
+	<tr>
+		<th>パスワード<@ifexec(id ne '')><br>（変更時のみ）<$end></th>
+		<td>
+			<input type="password" name="pass" class="w160" value=""<@if(argv#0, " <@argv#0>")>>
+			<strong><@Auth.pass_min>文字</strong>以上
+
+			<br>
+			<input type="password" name="pass2" class="w160" value=""> ←もう一度
+		</td>
+	</tr>
+	<tr>
+		<th>無効化</th>
+	<@ifexec(Auth.id eq id)>
+		<td><input type="hidden" name="disable" value="0">自分を無効にできません</td>
+	<$elsif(Auth.auto)>
+		<td><input type="hidden" name="disable" value="0">最初のユーザーは無効にできません。</td>
+	<$else>
+		<td>
+			<label><input type="checkbox" name="disable" value="1"<@if(h.disable, " checked")>>このユーザーを無効にする</label>
+		</td>
+	<$end>
+	</tr>
+	<tr>
+		<th>管理者<span class="help" data-help="アカウント管理。入金記録のない、古い請求の入金取消。請求ロックの無視。"></span></th>
+	<@ifexec(Auth.id eq id && Auth.isadmin)>
+		<td><input type="hidden" name="isadmin" value="1">自分の管理者権限は剥奪できません</td>
+	<$elsif(Auth.auto)>
+		<td><input type="hidden" name="isadmin" value="1">最初のユーザーは自動的に「管理者」になります</td>
+	<$else>
+		<td>
+			<label><input type="checkbox" id="isadmin" name="isadmin" value="1"<@if(h.isadmin, ' checked')>><span class="hevy">管理者</span>（アカウント管理）</label>
+		</td>
+	<$end>
+	</tr>
+</table>
+</div><!-- table-container -->

@@ -1,0 +1,124 @@
+<$'rm_any'>	Ignore non-command.
+<@#>		Treat lines starting with '#' as comments.
+################################################################################
+# pdf-logger startup skeleton
+################################################################################
+
+# Comment out for release
+<$Develop=1>
+#<$DevelopJS=1>
+
+#-------------------------------------------------------------------------------
+# Directories
+#-------------------------------------------------------------------------------
+# public directory
+<$constant(pub_dir)     = 'pub/'>
+<$constant(pubdist_dir) = 'pub-dist/'>
+<$constant(theme_dir)   = 'theme/'>
+<$constant(script_dir)  = 'js/'>
+
+# private directory
+<$constant(data_dir) = 'data/'>
+
+# skeleton directory
+<$regist_skeleton('skel/')>
+
+#-------------------------------------------------------------------------------
+# Init
+#-------------------------------------------------------------------------------
+# umask setting
+<$ifumask(HTTPD || UID ne '' && UID<101, 0000)>
+
+# locale
+<$load_locale("info/locale/ja.txt")>
+
+#-------------------------------------------------------------------------------
+# Database
+#-------------------------------------------------------------------------------
+<$DB = loadpm('DB::text', "<@data_dir>db/")>
+#<$DB = loadpm('DB::pg', 'database=plog', 'plog', 'test')>
+#<$DB = loadpm('DB::mysql', 'database=plog', 'plog', 'test')>
+
+#-------------------------------------------------------------------------------
+# Auth
+#-------------------------------------------------------------------------------
+<$Auth=loadpm('Auth', DB)>
+
+#<$Auth.table   = 'usr'>
+<$Auth.expires  = 365day>
+<$Auth.pass_min = 4>
+
+<$Auth.max_sessions = 2>
+<$Auth.logout_all   = 0>
+
+# ログインIP/HOST制限機能
+#<$Auth.allow_ip = begin_array>
+#	127.0.0.1
+#<$end>
+#<$Auth.allow_host = begin_array>
+#<$end>
+
+# 指定回数失敗したら、しばらくログインできなくする。
+#<$Auth.fail_limit = 10>
+# しばらくログインできなくなる時間（秒, min=分）
+#<$Auth.fail_sleep = 10min>
+
+# ユーザー未登録時に無条件に承認し管理権限を与える
+<$Auth.auto_login = true>
+
+#-------------------------------------------------------------------------------
+# Load main system
+#-------------------------------------------------------------------------------
+<$v=Main=loadapp('plog', DB)>
+
+<$v.systitle = '帳票PDFロガー'>
+<$v.start_year = 2024>
+
+<$v.data_dir   = data_dir>
+<$v.pub_dir    = pub_dir>
+<$v.pubdist_dir= pubdist_dir>
+<$v.theme_dir  = theme_dir>
+<$v.script_dir = script_dir>
+
+<$v.search_url = 'https://www.google.com/search?q='>
+<$v.default_tax_rate = '10'>
+
+<$v.allow_file_ext = flagq(jpg, jpeg, png, pdf, txt)>
+
+<$v.dtypes = begin_hash>
+	購入   = 1
+	販売   = 1
+	その他 = 1
+	_order = 1
+<$end>
+<$v.dformats = begin_hash>
+	請求書 = 1
+	発注書 = 1
+	見積書 = 1
+	領収書 = 1
+	納品書 = 1
+	明細書 = 1
+	その他 = 1
+	_order = 1
+<$end>
+<$v.dformat_invoice = '請求書'>
+
+<@> 税込総額表示が存在するはずの書類
+<$v.dformat_intax_list = arrayq(請求書 領収書)>
+
+#-------------------------------------------------------------------------------
+# Form setting
+#-------------------------------------------------------------------------------
+<$FormOptFunc = begin_func>
+	<$resolve_host()>
+#	<$ifset(ENV.HTTP_ORIGIN ne 'http://example.com', POST_ERR, 'Form Security Error')>
+
+	<$local(opt) = {}>
+	<$opt.max_size = 256K>
+	<$opt.str_max_chars = 256>	# word count
+	<$opt.txt_max_chars = 0>	# 0 is no limit
+
+	<$opt.allow_multi = Auth.ok>
+	<$opt.multi_max_size = 16M>
+	<$return(opt)>
+<$end>

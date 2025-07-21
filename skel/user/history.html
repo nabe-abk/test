@@ -1,0 +1,89 @@
+<$local(logs, t)>
+
+<@>権限確認
+<$ifredirect(! Auth.isadmin, myself)>
+
+<$ifset(Query.mon && !Query.year, Query.year, Now.year)>
+<$logs = Auth.load_logs(Query)>
+
+<!--=========================================================================-->
+<$v.title="ログイン履歴">
+
+<@call("_sub/menu_tree")>
+
+<!--=========================================================================-->
+<article>
+<h2><@v.title></h2>
+<div class="body">
+	<div class="search">
+		<form method="GET">
+		<select name="year" class="js-on-change-submit"><$local(x) = Query.year>
+			<@ifexec(!Query.mon)>
+			<option value="">年</option>
+			<$end>
+			<@foreach(t, reverse(from_to(2020, Now.year)))>
+			<option value="<@t>"<@if(t==x, ' selected')>><@t>年</option>
+			<$end>
+		</select>
+		<select name="mon" class="js-on-change-submit"><$local(x) = Query.mon>
+			<option value="">月</option>
+			<@foreach_num(t, 12)>
+			<option value="<@t>"<@if(t==x, ' selected')>><@t>月</option>
+			<$end>
+		</select>
+
+		<span class="iblock">
+			<input class="num w80" type="number" name="limit" min="100" max="10000" step="100" value="<@int(Query.limit) || 100>">件
+		</span>
+
+		<span class="iblock">
+			ID<input id="id" class="w100" type="text" name="id" value="<@esc(Query.id)>"><button>検索</button>
+			<@ifexec(Query.id ne '', begin)>
+			<button id="clear">クリア</button>
+			<script type="module">
+				$('#clear').click(function(){ $('#id').val('') })
+			</script>
+			<$end>
+		</span>
+		</form>
+	</div>
+
+<@ifexec(@logs, begin, begin)>
+	<div class="table-container">
+	<table class="log">
+	<thead>
+	<tr>
+		<th>日時</th>
+		<th>ID</th>
+		<th>種類</th>
+		<th>内容</th>
+		<th class="ip">IP</th>
+		<th class="host">HOST</th>
+		<th class="agent">Agent</th>
+	</tr>
+	</thead>
+	<tbody>
+	<@foreach(t, logs)>
+	<tr>
+		<td class="date"><@t.tm></td>
+		<td class=""><@t.id></td>
+		<td class="c type-<@t.type>"><@t.type></td>
+		<td><@replace(t.msg, "\n", "\n<br>")></td>
+		<td class="ip"><@t.ip></td>
+		<td class="host"><@t.host></td>
+		<td class="agent"><@t.agent></td>
+	</tr>
+	<$end>
+	</tbody>
+	</table>
+	</div><!-- table-container -->
+
+	<p><label><input type="checkbox" class="js-switch" data-fast="1" data-target="table.log .host, table.log .agent">HOST/Agentを表示</label></p>
+
+<$else>
+	<p>ログが見つかりません。</p>
+
+<$end>
+
+</div>
+</article>

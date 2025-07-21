@@ -1,0 +1,47 @@
+<$local(logs, t)>
+
+<$logs = Auth.load_logs({ id => argv#0 })>
+
+<@>-----------------------------------------------------------------------------
+<article>
+<h2>ログ</h2>
+<div class="body">
+
+<@ifexec(@logs, begin, begin)>
+	<div class="table-container">
+	<table class="log"><thead>
+	<tr>
+		<th>日時</th>
+		<th>ID</th>
+		<th>種類</th>
+		<th>内容</th>
+		<th class="ip">IP</th>
+		<th class="host">HOST</th>
+		<th class="agent">Agent</th>
+	</tr>
+	</thead>
+	<tbody>
+	<@foreach(t, logs)>
+	<tr>
+		<td class="date"><@t.tm></td>
+		<td class=""><@t.id></td>
+		<td class="c type-<@t.type>"><@t.type></td>
+		<td><@replace(t.msg, "\n", "\n<br>")></td>
+		<td class="ip"><@t.ip></td>
+		<td class="host"><@t.host></td>
+		<td class="agent"><@t.agent></td>
+	</tr>
+	<$end>
+	</tbody>
+	</table>
+	</div><!-- table-container -->
+
+	<p><label><input type="checkbox" class="js-switch" data-fast="1" data-target="table.log .host, table.log .agent">HOST/Agentを表示</label></p>
+
+<$else>
+	<p>ログが見つかりません。</p>
+
+<$end>
+
+</div>
+</article>

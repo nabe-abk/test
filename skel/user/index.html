@@ -1,0 +1,54 @@
+<$local(t)>
+
+<@>権限確認
+<$ifredirect(! Auth.isadmin, myself)>
+
+<$ifexec(Auth.allow_auto_login)>
+	<$Auth.init()>
+	<$redirect('./add')>
+<$end>
+
+<!--=========================================================================-->
+<$v.title="ユーザー管理">
+
+<@call("_sub/menu_tree")>
+
+<!--=========================================================================-->
+<article>
+<h2><@v.title></h2>
+<div class="body">
+
+	<p><label><input type="checkbox" class="js-switch" data-target="tr.disabled">無効ユーザーを表示</label></p>
+
+	<div class="table-container">
+	<table class="list">
+	<thead>
+	<tr>
+		<th>No</th>
+		<th>ID</th>
+		<th>名前</th>
+		<th>E-mail</th>
+		<th>管理者</th>
+		<th>無効</th>
+		<th>操作</th>
+	</tr>
+	</thead>
+	<tbody class="auto-bg">
+	<$local(check) = '<span class="can-edit">✓</span>'>
+	<@foreach(t, Auth.load_users('pkey'))>
+	<tr<@if(t.disable, ' class="disabled"')>>
+		<td class="num"><@t.pkey></td>
+		<td><@t.id></td>
+		<td><@t.name></td>
+		<td><@t.email></td>
+		<td class="c"><@if(t.isadmin, check)></td>
+		<td class="c disabled-flag"><@if(t.disable, "無効")></td>
+		<td><a href="<@myself2><@v.skel_dir>edit?id=<@t.id>">編集</a></td>
+	</tr>
+	<$end>
+	</tbody>
+	</table>
+	</div><!-- table-container -->
+
+</div><!-- body -->
+</article>

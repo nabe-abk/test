@@ -1,0 +1,168 @@
+<$local(x)>
+
+<$v.title ="取引先一覧">
+<$local(query) = '?' . make_query_amp()>
+<$local(url)   = v.thisurl . query>
+
+<script type="module">
+	asys.set_cookie('client_backurl', '<@url>');
+</script>
+
+<!--=========================================================================-->
+
+<@call("_sub/menu_tree")>
+
+<$ifset(!Query.sort, Query.sort, '-lastuse_ymd')>
+<$local(list, hits) = v.load_clients(Query)>
+
+<!--=========================================================================-->
+<article>
+<h2><@v.title></h2>
+<div class="body">
+	<div class="search">
+	<form method="GET">
+		<div class="iblocks">
+		<span class="iblock"><$x = Query.ctype>
+		<select name="ctype" class="js-on-change-submit ctype-<@esc(x)>">
+			<option class=""           value=""<@		if(x eq '',	' selected')>>種別</option>
+			<option class="ctype-購入" value="buy"<@	if(x eq 'buy',	' selected')>>購入</option>
+			<option class="ctype-販売" value="sale"<@	if(x eq 'sale',	' selected')>>販売</option>
+		</select></span>
+
+		<span class="iblock">
+		<select name="sort" class="js-on-change-submit"><$x = Query.sort>
+			<option value="kana"<@		if(x eq 'kana',		' selected')>>カナ▲</option>
+			<option value="-kana"<@		if(x eq '-kana',	' selected')>>カナ▼</option>
+			<option value="name"<@		if(x eq 'name',		' selected')>>名称▲</option>
+			<option value="-name"<@		if(x eq '-name',	' selected')>>名称▼</option>
+			<option value="zipcode"<@	if(x eq 'zipcode',	' selected')>>郵便番号▲</option>
+			<option value="-zipcode"<@	if(x eq '-zipcode',	' selected')>>郵便番号▼</option>
+			<option value="create_tm"<@	if(x eq 'create_tm',	' selected')>>登録日▲</option>
+			<option value="-create_tm"<@	if(x eq '-create_tm',	' selected')>>登録日▼</option>
+			<option value="update_tm"<@	if(x eq 'update_tm',	' selected')>>更新日▲</option>
+			<option value="-update_tm"<@	if(x eq '-update_tm',	' selected')>>更新日▼</option>
+			<option value="use_cnt"<@	if(x eq 'use_cnt',	' selected')>>使用回数▲</option>
+			<option value="-use_cnt"<@	if(x eq '-use_cnt',	' selected')>>使用回数▼</option>
+			<option value="lastuse_ymd"<@	if(x eq 'lastuse_ymd',	' selected')>>最終使用日▲</option>
+			<option value="-lastuse_ymd"<@	if(x eq '-lastuse_ymd',	' selected')>>最終使用日▼</option>
+			<option value="bi_timing"<@	if(x eq 'bi_timing',	' selected')>>締日▲</option>
+			<option value="-bi_timing"<@	if(x eq '-bi_timing',	' selected')>>締日▼</option>
+		</select></span>
+
+		<span class="iblock">
+			<input class="num w80" type="number" name="limit" min="100" max="10000" step="100" value="<@int(Query.limit) || 100>">件
+		</span>
+
+		<span class="iblock">
+			<input id="q" class="w300" type="text" name="q" value="<@esc(Query._q)>"><button>検索</button>
+			<@ifexec(ENV.QUERY_STRING)>
+			<button type="button" data-href="<@v.thisurl>">クリア</button>
+			<$end>
+		</span>
+		</div>
+	</form>
+	</div>
+	<div class="nosp">
+		<span class="iblock">
+			<label><input class="js-switch js-save" name="address" data-fast="1" data-target=".address,.zipcode" type="checkbox" checked>住所</label>
+		</span>
+		<span class="iblock">
+			<label><input class="js-switch js-save" name="tel" data-fast="1" data-target=".tel" type="checkbox" checked>TEL</label>
+		</span>
+		<span class="iblock">
+			<label><input class="js-switch js-save" name="fax" data-fast="1" data-target=".fax" type="checkbox">FAX</label>
+		</span>
+		<span class="iblock">
+			<label><input class="js-switch js-save" name="tnumber" data-fast="1" data-target=".tnumber" type="checkbox" checked>登録番号</label>
+		</span>
+		<span class="iblock">
+			<label><input class="js-switch js-save" name="tags" data-fast="1" data-target=".tags" type="checkbox" checked>タグ</label>
+		</span>
+		<span class="iblock">
+			<label><input class="js-switch js-save" name="ch_name" data-fast="1" data-target=".ch_name,.ch_email,.ch_tel" type="checkbox">担当者</label>
+		</span>
+		<span class="iblock">
+			<label><input class="js-switch js-save" name="c_bi_timing" data-fast="1" data-target=".bi_timing" type="checkbox">締日</label>
+		</span>
+		<span class="iblock">
+			<label><input class="js-switch js-save" name="c_create_tm" data-fast="1" data-target=".create_tm" type="checkbox">登録日</label>
+		</span>
+		<span class="iblock">
+			<label><input class="js-switch js-save" name="c_update_tm" data-fast="1" data-target=".update_tm" type="checkbox">更新日</label>
+		</span>
+		<span class="iblock">
+			<label><input class="js-switch js-save" name="c_use_info" data-fast="1" data-target=".use_info" type="checkbox" checked>最終使用</label>
+		</span>
+	</div>
+
+<@ifexec(list && @list)>
+	<$x = ##list+1>
+	<@ifexec(x == hits)>
+		<p>全 <@hits> 件表示</p>
+	<$else>
+		<p><@x>件 / <@hits>件中（<a href="<@url>&amp;limit=all">全件表示</a>）</p>
+	<$end>
+
+	<div class="table-container">
+	<table class="list slim js-sortable-value"><thead><$x=Query.sort>
+	<tr>
+		<th class=""><a href="<@url>&amp;sort=<@if(x eq 'name', '-')>name">名称</a></th>
+		<th class="">購</th>
+		<th class="">売</th>
+
+		<th class="zipcode"><a href="<@url>&amp;sort=<@if(x eq 'ymd', '-')>zipcode">郵便番号</a></th>
+		<th class="address">住所</th>
+		<th class="tel">Tel</th>
+		<th class="nosp fax">FAX</th>
+		<th class="nosp tnumber">登録番号</th>
+		<th class="nosp tags">タグ</th>
+
+		<th class="nosp ch_name">担当者</th>
+		<th class="nosp ch_email">E-mail</th>
+		<th class="nosp ch_tel">担当Tel</th>
+		<th class="nosp bi_timing">締</th>
+
+		<th class="nosp create_tm"><a href="<@url>&amp;sort=<@if(x eq 'create_tm', '-')>create_tm">登録日</a></th>
+		<th class="nosp update_tm"><a href="<@url>&amp;sort=<@if(x eq 'update_tm', '-')>update_tm">更新日</a></th>
+		<th class="nosp use_info small"><a href="<@url>&amp;sort=<@if(x eq 'use_cnt', '-')>use_cnt">使用数</a></th>
+		<th class="nosp use_info"><a href="<@url>&amp;sort=<@if(x eq 'lastuse_ymd', '-')>lastuse_ymd">最終使用</a></th>
+		<th>操作</th>
+	</tr>
+	</thead>
+	<tbody>
+	<@foreach(local(t), list)>
+	<tr>
+		<td class="" title="<@t.kana>"><a href="<@myself2>client/view?pkey=<@t.pkey>"><@t.name></a></td>
+		<td class="c"><@if(t.for_buy,  '✓')></td>
+		<td class="c"><@if(t.for_sale, '✓')></td>
+
+		<td class="nowrap zipcode"><@t.zipcode></td>
+		<td class="address"><@t.pref><@t.address1></td>
+		<td class="tel"><@t.tel></td>
+		<td class="nosp fax"><@t.fax></td>
+		<td class="nosp tnumber"><@t.tnumber></td>
+		<td class="nosp nowrap tags"><@v.parse_tags(t.tags)></td>
+
+		<td class="nosp ch_name"><@t.ch_name></td>
+		<td class="nosp ch_email small"><@t.ch_email></td>
+		<td class="nosp ch_tel small"><@t.ch_tel></td>
+		<td class="nosp num bi_timing"><@t.bi_timing></td>
+
+		<td class="nosp date create_tm" title="<@t.create_tm>"><@v.parse_datetm(t.create_tm)></td>
+		<td class="nosp date update_tm" title="<@t.update_tm>"><@v.parse_datetm(t.update_tm)></td>
+		<td class="nosp num  use_info"><@t.use_cnt></td>
+		<td class="nosp date use_info"><@t.lastuse_ymd></td>
+		<td class="nowrap c">
+			<a href="<@myself2><@v.skel_dir>edit?pkey=<@t.pkey>&amp;direct=1">編集</a>
+		</td>
+	</tr>
+	<$end>
+	</tbody>
+	</table>
+	</div><!-- table-container -->
+
+<$else>
+	<p class="error">見つかりません。</p>
+<$end>
+
+</div></article>

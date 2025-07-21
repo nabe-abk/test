@@ -1,0 +1,47 @@
+
+<$v.title ="取引先編集">
+
+<$local(pkey, h, backurl)>
+<$pkey = int(Query.pkey)>
+<$backurl = if(Query.direct, esc(Cookie.client_backurl)) || "<@myself2><@v.skel_dir>view?pkey=<@pkey>">
+
+<$h = v.load_client(pkey)>
+
+<!--=========================================================================-->
+
+<@call("_sub/menu_tree")>
+
+<$ifjump(!h, '_sub/error_message', '指定の取引先がみつかりません。')>
+
+<!--=========================================================================-->
+<article>
+<h2><@v.title></h2>
+<div class="body">
+	<form class="js-ajax js-reload-reset no-enter-submit" data-url="<@backurl>">
+	<input type="hidden" name="action" value="_ajax_edit_client">
+	<input type="hidden" name="pkey" value="<@pkey>">
+
+	<@call("<@v.skel_dir>_form", h)>
+
+	<div>
+		<button type="button" data-href="<@backurl>">戻る</button>
+		<button type="submit">保存する</button>
+	</div>
+	</form>
+
+	<form class="js-ajax js-check-form" data-url="<@myself2><@v.skel_dir>" data-confirm="この取引先を削除しますか？" data-focus="cancel">
+		<input type="hidden" name="action" value="_ajax_delete_client">
+		<input type="hidden" name="pkey" value="<@pkey>">
+
+	<@ifexec(h.use_cnt)>
+		<button id="btn-delete" type="button" disabled>削除する</button>
+		<span class="note">使用中のため削除できません。</span>
+	<$else>
+		<label><input class="js-enable" type="checkbox" data-target="#btn-delete">削除</label>
+		<button id="btn-delete" type="submit">削除する</button>
+	<$end>
+	</form>
+
+</div></article>
+
+<@call('_sub/load_logs', 'client', pkey)>

@@ -1,0 +1,152 @@
+
+<$v.title ="取引先表示">
+
+<$local(pkey) = int(Query.pkey)>
+<$local(h)    = v.load_client(pkey)>
+<$local(x)    = h && h._cpinfo>
+
+<$local(none)    = '&emsp;-'>
+<$local(backurl) = esc(Cookie.client_backurl) || "<@myself2><@v.skel_dir>">
+
+<!--=========================================================================-->
+
+<@call("_sub/menu_tree")>
+
+<$ifjump(!h, '_sub/error_message', '指定の取引先がみつかりません。')>
+
+<!--=========================================================================-->
+<article>
+<h2><@v.title></h2>
+<div class="body">
+	<div>
+		<label><input class="js-switch js-save" name="c_tags"    data-fast="1" data-target=".tags"    type="checkbox">タグ</label>
+		<label><input class="js-switch js-save" name="c_address" data-fast="1" data-target=".address" type="checkbox">住所等</label>
+		<label><input class="js-switch js-save" name="c_charge"  data-fast="1" data-target=".charge"  type="checkbox">担当者</label>
+		<label><input class="js-switch js-save" name="c_detail"  data-fast="1" data-target=".detail"  type="checkbox">詳細情報</label>
+	</div>
+
+	<div class="table-container">
+	<table id="client-form-table"><tbody>
+	<tr>
+		<th>属性</th>
+		<td class="mw400">
+			<@ifexec(h.for_buy )><span class="tag tag-購入先">購入先</span><$end>
+			<@ifexec(h.for_sale)><span class="tag tag-販売先">販売先</span><$end>
+		</td>
+	</tr>
+	<tr>
+		<th>名称</th>
+		<td><@h.name></td>
+	</tr>
+	<tr>
+		<th>フリガナ</th>
+		<td><@h.kana || none></td>
+	</tr>
+	<tr class="detail">
+		<th>正式名</th>
+		<td><@h.s_name></td>
+	</tr>
+	<tr class="tnumber">
+		<th>登録番号</th>
+		<td><@h.tnumber || none></td>
+	</tr>
+	<tr class="address">
+		<th>郵便番号</th>
+		<td><@h.zipcode || none></td>
+	</tr>
+	<tr class="address">
+		<th>住所1</th>
+		<td><@"<@h.pref><@h.address1>" || none>
+	</tr>
+	<tr class="address">
+		<th>住所2</th>
+		<td><@h.address2 || none></td>
+	</tr>
+	<tr>
+		<th>TEL</th>
+		<td><@h.tel || none></td>
+	</tr>
+	<tr class="address">
+		<th>FAX</th>
+		<td><@h.fax || none></td>
+	</tr>
+	<tr class="tags">
+		<th>タグ</th>
+		<td><@v.parse_tags(h.tags) || none></td>
+	</tr>
+	<tr>
+		<th>キーワード</th>
+		<td><@v.keywords></td>
+	</tr>
+	</tbody>
+
+	<tbody class="charge">
+		<tr>
+			<th colspan="2">担当者</th>
+		</tr>
+		<tr>
+			<th>名前</th>
+			<td>
+				<@h.ch_name>
+			</td>
+		</tr>
+		<tr>
+			<th>Tel</th>
+			<td>
+				<@h.ch_tel>
+			</td>
+		</tr>
+		<tr>
+			<th>E-mail</th>
+			<td>
+				<@h.ch_email>
+			</td>
+		</tr>
+	</tbody>
+	
+	<tbody class="detail">
+	<tr>
+		<th colspan="2">その他情報</th>
+	</tr>
+	<tr>
+		<th>締日</th>
+		<td>
+			<@h.bi_timing>日締 &emsp;※31=月末
+		</td>
+	</tr>
+	<tr>
+		<th>支払</th>
+		<td>
+			<@h.pay_month>ヶ月後 <@h.pay_timing>日払 &emsp;※31=月末
+		</td>
+	</tr>
+	</tbody>
+
+	<tbody>
+	<tr>
+		<th colspan="2">メモ</th>
+	</tr>
+	<tr>
+		<td colspan="2" class="memo"><@replace(h.memo, "\n", "<br>")></td>
+	</tr>
+	</tbody>
+	<tbody>
+		<th>保存書類</th>
+		<td>
+			<span class="documents-count"><@h.use_cnt></span>件
+			<span class="note">（最終:<span class="documents-date"><@h.lastuse_ymd></span>）</span>
+			<button type="button" data-href="<@myself2>document/?c_pkey=<@pkey>">書類を検索</button>
+		</td>
+	</tbody>
+	</table>
+	</div><!-- table-container -->
+
+
+	<form>
+		<button type="button" data-href="<@backurl>">戻る</button>
+		<button type="button" data-href="<@myself2><@v.skel_dir>edit?pkey=<@pkey>">編集する</button>
+	</form>
+
+</div></article>
+
+<@call('_sub/load_logs', 'client', pkey)>

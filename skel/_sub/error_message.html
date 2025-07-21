@@ -1,0 +1,15 @@
+<@>
+<@> エラーメッセージ
+<@>
+<@ifexec(argv#0, begin)><$msg(argv#0)><$end>
+<@ifexec(@Msg, begin)>
+
+<!--error msg================================================================-->
+<article>
+<h2>エラー</h2>
+<div class="body">
+	<div class="error messages"><@clear_msg("<div class=\"msssage\">%m</div>\n")></div>
+</article>
+
+<$ifset(v.title eq '', v.title, 'エラー')>
+<$end>

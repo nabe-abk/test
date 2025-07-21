@@ -1,0 +1,44 @@
+
+<$v.title ="書類の新規登録">
+
+<!--=========================================================================-->
+
+<@call("_sub/menu_tree")>
+
+<!--=========================================================================-->
+<article>
+<h2><@v.title></h2>
+<div class="body view-box">
+<div class="view-left">
+	<form id="form" class="js-ajax no-enter-submit">
+	<input type="hidden" name="action" value="_ajax_add_document">
+
+	<@call("<@v.skel_dir>_form", { dtype => argv#0 })>
+
+		<button type="button" data-href="<@myself2><@v.skel_dir>">戻る</button>
+		<button type="submit">追加する</button>
+		<label class="note"><input type="checkbox" id="continue"<@if(Query.continue, ' checked')>>追加後この画面に戻る</label>
+	</form>
+</div><!-- End of view-left -->
+
+<@G.ViewRight>
+
+</div></article>
+
+
+<script type="module">
+	$('#form').data('success', function(h){
+		// clear all files
+		$('#tbody-documents').find('input.doc-file').each(function(idx,dom){
+			if (!dom.files.length) return;
+			$(dom).closest('td').find('button.reset-file').click();
+		});
+
+		if ($('#continue').prop('checked')) {
+			location = '<@myself2><@v.skel>?continue=1';
+		} else {
+			location = '<@myself2><@v.skel_dir>view?pkey=' + h.data.pkey;
+		}
+	});
+</script>
+

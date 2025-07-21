@@ -1,0 +1,315 @@
+<@7>
+<$local(h) = argv#0 || {}>
+	<div>
+		<label><input class="js-switch js-save" name="c_tags"    data-fast="1" data-target=".tags"    type="checkbox">タグ</label>
+		<label><input class="js-switch js-save" name="c_address" data-fast="1" data-target=".address" type="checkbox">住所等</label>
+		<label><input class="js-switch js-save" name="c_charge"  data-fast="1" data-target=".charge"  type="checkbox">担当者</label>
+		<label><input class="js-switch js-save" name="c_detail"  data-fast="1" data-target=".detail"  type="checkbox">詳細情報</label>
+	</div>
+
+	<div class="table-container">
+	<table id="client-form-table"><tbody>
+	<tr>
+		<th>タイプ</th>
+		<td>
+			<label><input type="checkbox" name="for_buy"  value="1"<@if(h.for_buy,  ' checked')>>購入先</label>
+			<label><input type="checkbox" name="for_sale" value="1"<@if(h.for_sale, ' checked')>>販売先</label>
+		</td>
+	</tr>
+	<tr>
+		<th>名称・略称</th>
+		<td>
+			<input id="name" type="text" class="w300" name="name" value="<@h.name>" required>	<@\>
+			<button id="search-name" type="button" class="search-btn">検索</button>
+
+		<script type="module">
+			let bak='';
+			$('#name').on('keyup', function(evt){
+				const $obj = $(this);
+				const key  = evt.which;
+				const _val = $obj.val();
+				const val  = _val.replace(/[Ａ-Ｚａ-ｚ]+$/, '').replace(/　/g, ' ');
+				if (key==13			// Enter
+				 || key==8  || key==42		// BS or DEL
+				 || 37<=key && key<=40		// CURSOL
+				 || 112<=key && key<123)	// F1-F12
+				{
+					bak=val;
+					return;
+				}
+				const diff = _val.length==1 ? val : val.substr(bak.length);
+				bak = val;
+				if (!diff.match(/^[ぁ-ん\dー ]+$/)) return;
+				let kana='';
+				for(let i=0; i<diff.length; i++) {
+					const x = diff.substr(i,1);
+					if (x.match(/^[ぁ-ん]$/)) {
+						kana += String.fromCharCode( x.charCodeAt(0) - 'ぁ'.charCodeAt(0) + 'ァ'.charCodeAt(0) );
+					} else {
+						kana += x;
+					}
+				}
+
+				const $kana = $('#kana');
+				$kana.val( ($kana.val() + kana).replace('カブシキガイシャ', '') );
+			}).on('focus', function(evt){
+				bak = $(this).val();
+			});
+
+			$('#search-name').on('click', function(evt){
+				const val = $('#name').val();
+				if (val == '') return;
+				window.open( '<@v.search_url>' + encodeURIComponent(val) );
+			});
+		</script>
+		</td>
+	</tr>
+	<tr>
+		<th>フリガナ<span class="help" data-help="「数字」「カタカナ」「スペース」のみ。アルファベット、記号不可。「株式会社」等は入力しない。"></span></th>
+		<td><input type="text" id="kana" class="w500 small" name="kana" value="<@h.kana>" pattern="^[0-9 ァ-ヺー]*$"></td>
+	</tr>
+	<tr class="detail">
+		<th>正式名</th>
+		<td><input type="text" class="w500" name="fullname" value="<@h.fullname>"></td>
+	</tr>
+	<tr class="tnumber">
+		<th>登録番号<span class="help" data-help="取引先の税務登録番号。書類の内容から取引先を自動設定する際の検索対象です。"></span></th>
+		<td><input type="text" class="w200" name="tnumber" value="<@h.tnumber>" pattern="^(?:|T?\d{13})$"></td>
+	</tr>
+
+	<tr class="address">
+		<th>郵便番号</th>
+		<td>
+			<input type="text" id="zipcode" class="w100 no-ime" name="zipcode" value="<@h.zipcode>" maxlength="8" pattern="^(?:|\d\d\d-\d\d\d\d)$">
+
+		<script type="module">
+		$('#zipcode').on('keypress', function(evt){
+			// input number only
+			if (evt.which<0x30 || 0x39<evt.which)
+				evt.preventDefault();
+		});
+		$('#zipcode').on('keyup', function(evt){
+			const $obj = $(this);
+			let   val  = $obj.val();
+			// auto hyphen
+			if (evt.keyCode != 8 && evt.keyCode != 46) {
+				if (val.match(/^\d\d\d$/)) return $obj.val( val + '-' );
+				const m = val.match(/^(\d{3})(\d{4})/);
+				if (m) {
+					val = m[1] + '-' + m[2];
+					$obj.val( val );
+				}
+			}
+
+			// auto load address
+			if (!this.checkValidity()) return;
+			const zip3 = val.substr(0,3);
+			const zip4 = val.substr(4,4)
+
+			const file = '<@Basepath><@v.pubdist_dir>zipcode/' + zip3 + ".json";
+
+			$.ajax(file, {
+				method:	'GET',
+				dataType: 'json',
+				success: function(h) {
+					if (!h) return;
+					if (h.zip != zip3) return;
+
+					let pref = h.pref;
+					let adr  = h.data[zip4];
+					if (adr) {
+						const ma = adr.match(/^(.*[都道府県]) (.*)/);
+						if (ma) {
+							pref = ma[1];
+							adr  = ma[2];
+						}
+					}
+
+					$('#pref').val( pref );
+					const $adr1 = $('#adr1');
+					if ($adr1.val() != '') return;
+					$adr1.val( adr );
+				}
+			});
+		});
+		</script>
+		</td>
+	</tr>
+	<tr class="address">
+		<th>都道府県</th>
+		<td><select id="pref" name="pref">
+			<option value="">（選択）</option>
+
+			<option value="北海道">北海道</option>
+			<optgroup label="─東北─">
+			<option value="青森県">青森県</option>
+			<option value="岩手県">岩手県</option>
+			<option value="宮城県">宮城県</option>
+			<option value="秋田県">秋田県</option>
+			<option value="山形県">山形県</option>
+			<option value="福島県">福島県</option>
+			</optgroup>
+			<optgroup label="─関東─">
+			<option value="東京都">東京都</option>
+			<option value="神奈川県">神奈川県</option>
+			<option value="千葉県">千葉県</option>
+			<option value="埼玉県">埼玉県</option>
+			<option value="茨城県">茨城県</option>
+			<option value="栃木県">栃木県</option>
+			<option value="群馬県">群馬県</option>
+			</optgroup>
+			<optgroup label="─北陸─">
+			<option value="新潟県">新潟県</option>
+			<option value="富山県">富山県</option>
+			<option value="石川県">石川県</option>
+			<option value="福井県">福井県</option>
+			</optgroup>
+			<optgroup label="─甲信越─">
+			<option value="山梨県">山梨県</option>
+			<option value="長野県">長野県</option>
+			<option value="新潟県">新潟県</option>
+			</optgroup>
+			<optgroup label="─東海─">
+			<option value="静岡県">静岡県</option>
+			<option value="愛知県">愛知県</option>
+			<option value="岐阜県">岐阜県</option>
+			</optgroup>
+			<optgroup label="─近畿─">
+			<option value="大阪府">大阪府</option>
+			<option value="京都府">京都府</option>
+			<option value="三重県">三重県</option>
+			<option value="滋賀県">滋賀県</option>
+			<option value="兵庫県">兵庫県</option>
+			<option value="奈良県">奈良県</option>
+			<option value="和歌山県">和歌山県</option>
+			</optgroup>
+			<optgroup label="─中国─">
+			<option value="鳥取県">鳥取県</option>
+			<option value="島根県">島根県</option>
+			<option value="岡山県">岡山県</option>
+			<option value="広島県">広島県</option>
+			<option value="山口県">山口県</option>
+			</optgroup>
+			<optgroup label="─四国─">
+			<option value="徳島県">徳島県</option>
+			<option value="香川県">香川県</option>
+			<option value="愛媛県">愛媛県</option>
+			<option value="高知県">高知県</option>
+			</optgroup>
+			<optgroup label="─九州─">
+			<option value="福岡県">福岡県</option>
+			<option value="佐賀県">佐賀県</option>
+			<option value="長崎県">長崎県</option>
+			<option value="熊本県">熊本県</option>
+			<option value="大分県">大分県</option>
+			<option value="宮崎県">宮崎県</option>
+			<option value="鹿児島県">鹿児島県</option>
+			</optgroup>
+			<option value="沖縄県">沖縄県</option>
+		</select>
+		<button id="search-adr" type="button" class="search-btn">郵便番号を検索</button>
+		<script type="module">
+			const $pref = $('#pref');
+			if ($pref.val() == '') $pref.val('<@h.pref>');
+
+			$('#search-adr').on('click', function(evt){
+				const val = $('#pref').val() + $('#adr1').val();
+				if (val == '') return;
+				window.open( '<@v.search_url>' + encodeURIComponent('郵便番号 ' + val) );
+			});
+		</script>
+		</td>
+	</tr>
+	<tr class="address">
+		<th>住所1</th>
+		<td><input type="text" id="adr1" class="w400" name="address1" value="<@h.address1>"> ※番地まで</td>
+	</tr>
+	<tr class="address">
+		<th>住所2</th>
+		<td><input type="text" id="adr2" class="w400" name="address2" value="<@h.address2>"></td>
+	</tr>
+	<tr>
+		<th>TEL<span class="help" data-help="書類の内容から取引先を自動設定する際、同一の「電話番号表記」を検索します。"></span></th>
+		<td>
+			<input id="tel" type="tel" class="w200" name="tel" value="<@h.tel>" pattern="^(?:|\+?\d{2,4}-?\d{2,4}-?\d{3,4}(?:#\d+)?)$">	<@\>
+			<button id="search-tel" type="button" class="search-btn">検索</button>
+
+		<script type="module">
+			$('#search-tel').on('click', function(evt){
+				const val = $('#tel').val();
+				if (val == '') return;
+				window.open( '<@v.search_url>' + encodeURIComponent(val) );
+			});
+		</script>
+		</td>
+	</tr>
+	<tr class="address">
+		<th>FAX</th>
+		<td>
+			<input type="tel" class="w200" name="fax" value="<@h.fax>" pattern="^(?:|\+?\d{2,4}-?\d{2,4}-?\d{3,4}(?:#\d+)?)$">
+		</td>
+	</tr>
+	<tr class="tags">
+		<th>タグ<span class="help" data-help="スペース区切りで短い単語を複数設定できます。"></span></th>
+		<td><input type="text" class="w400" name="tags" value="<@h.tags>"></td>
+	</tr>
+	<tr>
+		<th>キーワード<span class="help" data-help="書類の内容から取引先を自動設定する際、ここに書かれた文字列を使ってキーワード判定します。スペース区切り。"></span></th>
+		<td><input type="text" class="w400" name="keywords" value="<@h.keywords>"></td>
+	</tr>
+	</tbody>
+
+	<tbody class="charge">
+		<tr>
+			<th colspan="2">担当者</th>
+		</tr>
+		<tr>
+			<th>名前</th>
+			<td>
+				<input type="text" class="w200" name="ch_name" value="<@h.ch_name>">
+			</td>
+		</tr>
+		<tr>
+			<th>Tel</th>
+			<td>
+				<input type="tel" class="w200" name="ch_tel" value="<@h.ch_tel>">
+			</td>
+		</tr>
+		<tr>
+			<th>E-mail</th>
+			<td>
+				<input type="email" class="w300" name="ch_email" value="<@h.ch_email>">
+			</td>
+		</tr>
+	</tbody>
+	
+	<tbody class="detail">
+	<tr>
+		<th colspan="2">その他情報</th>
+	</tr>
+	<tr>
+		<th>締日</th>
+		<td>
+			<input type="number" class="w40 nospin pay_info" name="bi_timing" value="<@h.bi_timing>" min="1" max="31">日締 &emsp;※31=月末
+		</td>
+	</tr>
+	<tr class="node-only">
+		<th>支払</th>
+		<td>
+			<input type="number" class="w40 nospin pay_info" name="pay_month"  value="<@h.pay_month>"  min="0" max="12">ヶ月後
+			<input type="number" class="w40 nospin pay_info" name="pay_timing" value="<@h.pay_timing>" min="1" max="31">日払 &emsp;※31=月末
+		</td>
+	</tr>
+	</tbody>
+
+	<tbody>
+	<tr>
+		<th colspan="2">メモ</th>
+	</tr>
+	<tr>
+		<td colspan="2"><textarea class="w100p memo" rows="3" name="memo_txt"><@esc(h.memo)></textarea></td>
+	</tr>
+	</tbody>
+	</table>
+	</div><!-- table-container -->
+

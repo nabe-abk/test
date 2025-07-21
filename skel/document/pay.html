@@ -1,0 +1,211 @@
+<$local(x, dis)>
+
+<$local(ow) = argv#0 || begin_hash>
+	name	= 買掛
+	dtype	= 購入
+<$end>
+
+<$v.regist_js_module("<@v.script_dir>pay_document.js")>
+
+
+<$v.title = ow.name . "一覧">
+<$local(query) = '?' . make_query_amp()>
+<$local(url)   = v.thisurl . query>
+
+<script type="module">
+	asys.set_cookie('document_backurl', '<@url>');
+</script>
+
+<$Query.dtype ||= ow.dtype>
+<$Query.dformat = v.dformat_invoice>
+
+<!--=========================================================================-->
+<@call("_sub/menu_tree")>
+
+<$ifset(!Query.sort, Query.sort, '-ymd')>
+<$local(list, hits) = v.load_documents(Query)>
+
+<!--=========================================================================-->
+<article>
+<h2><@v.title></h2>
+<div class="body">
+	<div class="search">
+	<form method="GET">
+		<div class="iblocks">
+
+		<span class="iblock"><$dis = if(Query.from_date || Query.to_date, ' disabled')>
+		<select name="year" class="js-on-change-submit"<@dis>><$x = Query.year>
+			<option value="">年</option>
+		<@foreach(local(t), reverse(from_to(v.start_year || 2025,Now.year)))>
+			<option value="<@t>"<@if(x == t, ' selected')>><@t>年</option>
+		<$end>
+		</select><select name="mon" class="js-on-change-submit"<@dis || if(!Query.year, ' disabled')>><$x = Query.mon>
+			<option value="">月</option>
+		<@foreach_num(local(t), 12)>
+			<option value="<@t>"<@if(x == t, ' selected')>><@t>月</option>
+		<$end>
+		</select></span>
+
+		<span class="iblock"><$dis = if(Query.year || Query.mon, ' disabled')>
+			<input class="js-on-change-submit" type="date" max="9999-12-31" name="from_date" value="<@esc(Query.from_date)>"<@dis>> ～ <@\>
+			<input class="js-on-change-submit" type="date" max="9999-12-31" name="to_date" value="<@esc(Query.to_date)>"<@dis>>
+		</span>
+
+		<span class="iblock">
+			<$local(min) = Query.min_price>
+			<$local(max) = Query.max_price>
+			<$x = Query.price_type>
+			<select name="price_type" class="<@if(min ne '' || max ne '', 'js-on-change-submit')>">
+				<option value="total"<@   if(x eq 'total',    ' selected')>>総額</option>
+				<option value="subtotal"<@if(x eq 'subtotal', ' selected')>>税抜</option>
+				<option value="tax"<@     if(x eq 'tax',      ' selected')>>税額</option>
+<@>				<option value="remain"<@  if(x eq 'remain',   ' selected')>>残高</option>
+			</select>
+			<input type="text" class="price w80 js-on-change-submit" name="min_price" value="<@if(min ne '', v.printc(min))>"> ～ <@\>
+			<input type="text" class="price w80 js-on-change-submit" name="max_price" value="<@if(max ne '', v.printc(max))>">
+		</span>
+
+		<span class="iblock">
+			<label><input type="checkbox" class="js-on-change-submit" name="remain" value="1"<@if(Query.remain, ' checked')>>残高あり</label>
+		</span>
+		</div>
+
+		<div class="iblocks">
+		<span class="iblock"><$x = Query.dtype>
+		<select name="dtype" class="js-on-change-submit">
+		<@foreach_keys(local(t), v.dtypes)>
+			<option class="dtype-<@t>" value="<@t>"<@if(t eq x, ' selected')>><@t></option>
+		<$end>
+		</select></span>
+
+		<span class="iblock"><$x = Query.dformat>
+		<select name="dformat">
+			<option class="dformat-<@x>" value="<@x>" selected><@x></option>
+		</select></span>
+
+		<span class="iblock">
+		<select name="sort" class="js-on-change-submit"><$x = Query.sort>
+			<option value="ymd"<@		if(x eq 'ymd',		' selected')>>日付▲</option>
+			<option value="-ymd"<@		if(x eq '-ymd',		' selected')>>日付▼</option>
+			<option value="kana"<@		if(x eq 'kana',		' selected')>>カナ▲</option>
+			<option value="-kana"<@		if(x eq '-kana',	' selected')>>カナ▼</option>
+			<option value="name"<@		if(x eq 'name',		' selected')>>名称▲</option>
+			<option value="-name"<@		if(x eq '-name',	' selected')>>名称▼</option>
+			<option value="total"<@		if(x eq 'total',	' selected')>>総額▲</option>
+			<option value="-total"<@	if(x eq '-total',	' selected')>>総額▼</option>
+			<option value="paid_ymd"<@	if(x eq 'paid_ymd',	' selected')>>決済日▲</option>
+			<option value="-paid_ymd"<@	if(x eq '-paid_ymd',	' selected')>>決済日▼</option>
+			<option value="paid"<@		if(x eq 'paid',		' selected')>>決済額▲</option>
+			<option value="-paid"<@		if(x eq '-paid',	' selected')>>決済額▼</option>
+			<option value="remain"<@	if(x eq 'remain',	' selected')>>残高▲</option>
+			<option value="-remain"<@	if(x eq '-remain',	' selected')>>残高▼</option>
+			<option value="create_tm"<@	if(x eq 'create_tm',	' selected')>>登録日▲</option>
+			<option value="-create_tm"<@	if(x eq '-create_tm',	' selected')>>登録日▼</option>
+			<option value="update_tm"<@	if(x eq 'update_tm',	' selected')>>更新日▲</option>
+			<option value="-update_tm"<@	if(x eq '-update_tm',	' selected')>>更新日▼</option>
+		</select></span>
+
+		<span class="iblock">
+			<input class="num w80" type="number" name="limit" min="100" max="10000" step="100" value="<@int(Query.limit) || 100>">件
+		</span>
+
+		<span class="iblock">
+			<input id="q" class="w300" type="text" name="q" value="<@esc(Query._q)>"><button>検索</button>
+			<@ifexec(ENV.QUERY_STRING)>
+			<button type="button" data-href="<@v.thisurl>">クリア</button>
+			<$end>
+		</span>
+		</div>
+	</form>
+	</div>
+
+<@ifexec(list && @list)>
+	<$x = ##list+1>
+	<@ifexec(x == hits)>
+		<p>全 <@hits> 件表示</p>
+	<$else>
+		<p><@x>件 / <@hits>件中（<a href="<@url>&amp;limit=all">全件表示</a>）</p>
+	<$end>
+
+	<form class="js-ajax js-reload-reset no-enter-submit" data-url="<@url>">
+	<input type="hidden" name="action" value="_ajax_save_pay">
+
+	<$local(sum)  = {}>
+	<$local(cols) = arrayq(subtotal tax total paid remain)>
+	<div class="table-container">
+	<table class="list slim js-sortable-value" id="pay-table">
+	<thead><$x=Query.sort>
+	<tr>
+		<th class=""><a href="<@url>&amp;sort=<@if(x eq 'ymd', '-')>ymd">日付</th>
+		<th class=""><a href="<@url>&amp;sort=<@if(x eq 'kana', '-')>kana">相手</a></th>
+		<th class="nosp dtype">種別</th>
+		<th class="nosp dformat">書式</th>
+		<th class="nosp title">概要</th>
+
+		<th class="price"><a href="<@url>&amp;sort=<@if(x eq 'total', '-')>total">総額</a></th>
+
+		<th class="pay date">決済情報</th>
+		<th class="pay price"><a href="<@url>&amp;sort=<@if(x eq 'remain', '-')>remain">残高</th>
+
+		<th class="nosp">操作</th>
+	</tr>
+	</thead>
+	<tbody id="pay-lines">
+	<@foreach(local(t), list)>
+	<tr data-total="<@t.total>">
+		<td class="date">
+			<a href="<@myself2><@v.skel_dir>view?pkey=<@t.pkey>"><@t.ymd></a>
+			<input type="hidden" name="pkey_ary" value="<@t.pkey>">
+		</td>
+		<td class="" title="<@t.kana>"><a href="<@myself2>client/view?pkey=<@t.c_pkey>"><@t.name></a></td>
+		<td class="c nosp dtype dtype-<@t.dtype>"><@t.dtype></td>
+		<td class="c nosp dformat dformat-<@t.dformat>"><@t.dformat></td>
+		<td class="nosp title"><@t.title></td>
+
+		<td class="price" data-sort="<@t.total>"><@v.printc(t.total)></td>
+
+		<td class="nowrap pay" data-sort="<@t.paid>">
+			<span class="pay-date">
+				<input type="date" name="date_ary" max="9999-12-31" value="<@t.paid_ymd>">
+			</span>
+			<span class="pay-price">
+				<button type="button" class="spFirstLetter pay-all">全額</button>	<@\>
+				<input class="w100 price line-paid js-price" type="text" name="paid_ary" value="<@v.printc(t.paid)>">
+			</span>
+		</td>
+		<td class="pay price line-remain" data-sort="<@t.remain>"><@v.printc(t.remain)></td>
+
+		<td class="nosp nowrap c">
+			<a href="<@myself2><@v.skel_dir>edit?pkey=<@t.pkey>&amp;direct=1">編集</a>
+		</td>
+		<$foreach(local(x), cols)><$sum.(x) += t.(x)><$end>
+	</tr>
+	<$end>
+	</tbody>
+	<tfoot>
+	<tr>
+		<td colspan="1" class="nosp noborder"></td>
+		<td colspan="1" class="dtype noborder"></td>
+		<td colspan="1" class="dformat noborder"></td>
+		<td colspan="2" class="r noborder">表示合計</td>
+
+		<td class="num"><@v.printc(sum.total)></td>
+		<td class="num" id="view-total-paid"><@v.printc(sum.paid)></td>
+		<td class="num" id="view-total-remain"><@v.printc(sum.remain)></td>
+		<td class="nosp" colspan="1"></td>
+	</tr>
+	</tfoot>
+	</table>
+	</div><!-- table-container -->
+
+	<div>
+		<button type="button" data-href="<@myself2>document/">戻る</button>
+		<button type="submit">保存する</button>
+	</div>
+	</form>
+
+<$else>
+	<p class="error">見つかりません。</p>
+<$end>
+
+</div></article>

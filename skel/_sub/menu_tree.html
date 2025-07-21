@@ -1,0 +1,48 @@
+<$local(t, sep)>
+<$local(dir) = v.skel_dir>
+<@>
+<$local(body_class) = 'dir-' . replace(dir, '/.*', '')>
+<@>
+<nav class="tree">
+<a href="<@myself>" class="dir">メニュー</a>
+<@>-----------------------------------------------------------------------------
+<$local(items) = begin_hash>
+	document/	= 書類
+	client/		= 取引先
+	_order		= 1
+<$end>
+
+ <span class="splitter">&gt;</span>
+ <span class="items">
+ <span class="item-start">[</span>
+<@foreach_hash(t, items, begin)>
+  <@sep>
+  <@ifexec(dir eq t.key, begin, begin)>
+	<span class="select"><@t.val></span> <@\>
+  <$else>
+	<a href="<@myself2><@t.key>"><@t.val></a> <@\>
+  <$end> <@\>
+  <$sep=",\n"> <@\>
+<$end>
+ <span class="item-end">]</span>
+ </span>
+<@>-----------------------------------------------------------------------------
+<$local(items) = dir && call("<@v.skel_dir>_items", argv#1)>
+<@ifexec(items && (!items._order || @items._order), begin.items)>
+ <span class="splitter">&gt;</span>
+ <span class="items">
+ <span class="item-start">[</span>
+<$sep=''>
+<@foreach_hash(t, items, begin)>
+  <@sep>
+  <@ifexec(v.skel_name eq t.key || v.skeleton eq t.key, begin, begin)>
+	<span class="select"><@t.val></span> <@\>
+  <$else>
+	<a href="<@myself2><@v.skel_dir><@if(t.key ne 'index', t.key)>"><@t.val></a> <@\>
+  <$end> <@\>
+  <$sep=','> <@\>
+<$end>
+ <span class="item-end">]</span>
+ </span>
+<$end.items>
+</nav>

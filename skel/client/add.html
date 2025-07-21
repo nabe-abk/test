@@ -1,0 +1,35 @@
+
+<$v.title ="取引先の新規登録">
+
+<!--=========================================================================-->
+
+<@call("_sub/menu_tree")>
+
+<!--=========================================================================-->
+<article>
+<h2><@v.title></h2>
+<div class="body">
+	<form id="form" class="js-ajax no-enter-submit">
+	<input type="hidden" name="action" value="_ajax_add_client">
+
+	<@call("<@v.skel_dir>_form")>
+
+	<div>
+		<button type="button" data-href="<@myself2><@v.skel_dir>">戻る</button>
+		<button type="submit">追加する</button>
+		<label class="note"><input type="checkbox" id="continue"<@if(Query.continue, ' checked')>>追加後この画面に戻る</label>
+	</div>
+	</form>
+</div>
+</article>
+
+<script type="module">
+	$('#form').data('success', function(h){
+		if ($('#continue').prop('checked')) {
+			location = '<@myself2><@v.skel>?continue=1';
+		} else {
+			location = '<@myself2><@v.skel_dir>view?pkey=' + h.data.pkey;
+		}
+	});
+</script>
+

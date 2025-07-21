@@ -1,0 +1,300 @@
+@charset "UTF-8";
+/*******************************************************************************
+  CSS for asys.js
+  						(C)2025 nabe@abk
+*******************************************************************************/
+/* [TAB=8] */
+/*------------------------------------------------------------------------------
+ UI icons
+------------------------------------------------------------------------------*/
+.ui-icon {
+	width:			16px;
+	height:			16px;
+	display:		inline-block;
+	background-position:	99px 99px;
+	background-repeat:	no-repeat;
+	background-image:	url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAgAQMAAAC//W0vAAAABlBMVEUAAAf8/PyIbBtEAAAAAnRSTlP/AOW3MEoAAADJSURBVBjTdc4xjgIxDEDRjChSUOQIPkoOskehMBIH4EoZUUy509GgTaQtpiSIJiiRjR0BooBUr3D8bfj1zBvJMSiWxbSFMFnmw8Hcrg1jvf6OO1Nr2/zVyz7ZBwtkp1ydavMFdNbOP515KW5e94HkLjyv+7eJ/4V92Z6PHGtPRD6z1iT8+bLPDDYyIyGxJCYmbJ5QOHLDAuRNhoAFsyNQQh6S3TpTfHBpCKutVUIamhc2DJiVTjhy0WVgiCdZJvQSjs9Ezyu/XHYH55/2IroZ0KMAAAAASUVORK5CYII=");
+}
+.ui-icon.ui-button {
+	padding:		0;
+	cursor:			pointer;
+	box-sizing:		content-box;
+}
+.ui-button.ui-button-icon-only:not(.ui-icon) {
+	margin:			0;
+	padding:		0;
+	width:			24px;
+	height:			24px;
+	box-sizing:		border-box;
+	vertical-align:		top;
+}
+.ui-button.ui-button-icon-only:not(.ui-icon) .ui-icon {
+	vertical-align:		middle;
+}
+
+/* clickable icons */
+button,
+.ui-icon-close,
+.ui-icon-search,
+.ui-icon-close,
+.ui-icon-closethick {
+	cursor:			pointer;
+}
+
+/* jQuery UI icons */
+.ui-icon-search	{ background-position:   0px 0px; }
+.ui-icon-wrench	{ background-position: -16px 0px; }
+.ui-icon-image	{ background-position: -32px 0px; }
+.ui-icon-close	{ background-position: -48px 0px; }
+.ui-icon-closethick { background-position: -64px 0px; }
+
+/* js-switch icon */
+.sw-show .ui-icon.switch-icon {
+	background-position:	-0px -16px;
+	width:			14px;
+	height:			13px;
+}
+.sw-hide .ui-icon.switch-icon {
+	background-position:	-16px -16px;
+	width:			14px;
+	height:			13px;
+}
+
+/*------------------------------------------------------------------------------
+ dialog
+------------------------------------------------------------------------------*/
+.ui-overlay::backdrop, .ui-dialog::backdrop {
+	background-color:	rgba(0,0,0,0.2);
+}
+/* dialog.ui-overlay for only displays overlay::backdrop */
+.ui-overlay {
+	border:			none;
+	background:		none;
+	position:		fixed;
+	top:			0;
+	left:			0;
+	width:			100%;
+	height:			100%;
+}
+.ui-dialog {
+	position:		absolute;
+	padding:		0;
+	margin:			0;
+
+	overflow:		hidden;
+	min-width:		200px;
+	max-height:		100vh;
+
+	resize:			both;
+	outline:		none;	/* for :focus-visible */
+}
+.ui-dialog, .ui-dialog-content {
+	box-sizing:		border-box;
+}
+.ui-dialog-titlebar {
+	font-size:		12pt;
+	font-weight:		bold;
+	padding:		0.4em 1em;
+	position:		relative;
+	cursor:			move;
+}
+.ui-dialog-titlebar .ui-button {
+	position:		absolute;
+	right:			0.5em;
+	top:			0.4em;
+	padding:		0;
+	line-height:		0;
+}
+.ui-dialog-content {
+	padding:		0.5em 1em;
+	overflow:		auto;
+}
+.ui-dialog-content p {
+	max-width:		640px;
+}
+.ui-dialog-buttonpane {
+	padding:		0.3em 1em 0.5em 0;
+	position:		absolute;
+	bottom:			0;
+	right:			0;
+}
+.ui-dialog-buttonpane button {
+	font-weight:		normal;
+	text-align:		left;
+	margin:			0.5em 0.2em;
+	padding:		0.4em 1em;
+	line-height:		1.5;
+}
+
+/* error dialog */
+.ui-dialog.error-dialog {
+	color:			#000;
+	background-color:	#fff8f8;
+	border-color:		#f69;
+	background-image:	none;
+}
+.ui-dialog.error-dialog .ui-widget-header {
+	background-color:	#f69;
+	background-image:	none;
+}
+.ui-dialog.error-dialog .ui-widget-header .ui-button {
+	background-color:	#fdd;
+}
+.ui-dialog.error-dialog .ui-button {
+	color:			#444;
+	border-color:		#d99;
+	background-image:	linear-gradient(to bottom, #fdd, #faa);
+}
+.ui-dialog.error-dialog .ui-button:hover {
+	background-image:	linear-gradient(to bottom, #fee, #fcc);
+}
+
+/* close icon for error dialog */
+.ui-dialog.error-dialog .ui-icon-closethick {
+	border-color:	#900;
+	filter:		brightness(0) saturate(100%) invert(16%) sepia(83%) saturate(7491%) hue-rotate(2deg) brightness(99%) contrast(116%);	/* #f00 */
+}
+
+/*------------------------------------------------------------------------------
+ customization
+------------------------------------------------------------------------------*/
+.ui-icon {
+	/* #33F: filter generate by https://angel-rs.github.io/css-color-filter-generator/ */
+	filter: brightness(0) saturate(100%) invert(27%) sepia(73%) saturate(7491%) hue-rotate(242deg) brightness(96%) contrast(110%);
+}
+.ui-dialog {
+	background-color:	#eeeeff;
+	border:			2px solid #6b75b8;
+	border-radius:		10px;
+	box-shadow:		8px 8px 4px 4px rgba(60,60,100,0.75);
+
+	font-size:		10.5pt;
+	line-height:		130%;
+}
+.ui-dialog .ui-widget-header {
+	color:			#000;
+	background-color:	#adb8ff;
+	font-weight:		bold;
+	font-size:		12pt;
+
+	border:			none;
+	border-radius:		8px 8px 0 0;
+}
+.ui-dialog .ui-widget-header .ui-button {
+	background-color:	#ddf;
+	background-image:	none;
+	border-radius:		4px;
+}
+.ui-dialog span.ui-dialog-title {
+	height:			1em;
+	margin-top:		0;
+	padding-top:		0;
+	padding-bottom:		2px;
+}
+.ui-dialog .ui-icon {
+	text-indent:		0px;
+}
+.ui-dialog span.ui-icon-closethick {
+}
+.ui-dialog .ui-dialog-buttonpane {
+	margin-top:		0px;
+	padding-top:		0px;
+}
+
+.ui-dialog div.pre {
+	white-space:		pre-wrap;
+	font-family:		monospace;
+}
+.ui-dialog ul {
+	margin:			1em 0em;
+}
+.ui-dialog p {
+	text-indent:		0;
+	margin-left:		1em;
+}
+.ui-dialog th,
+.ui-dialog td {
+	white-space:		nowrap;
+}
+
+/*------------------------------------------------------------------------------
+ progressbar
+------------------------------------------------------------------------------*/
+.ui-progressbar {
+	margin:			0.5em 0;
+	max-width:		400px;
+	border-color:		#6b75b8;
+	background-color:	#fff;
+}
+.ui-progressbar .label {
+	color:			#000;
+	font-weight:		bold;
+	text-shadow:	 1px -1px 2px #fff,
+			 1px -1px 2px #fff,
+			-1px  1px 2px #fff,
+			 1px  1px 2px #fff;
+}
+.ui-progressbar,
+.ui-progressbar .label:before {
+	height:			20px;
+	vertical-align:		middle;
+}
+.ui-progressbar-value {
+	background-color:	#aac;
+}
+
+/*--------------------------------------------------------------------
+ pop up help
+--------------------------------------------------------------------*/
+.help {
+	color:		rgba(255,255,255,0);
+	font-weight:	bold;
+	cursor:		pointer;
+
+	display:	inline-block;
+	vertical-align:	middle;
+	margin:		0 0 3px 1px;
+
+	width:		16px;
+	height:		16px;
+	background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAMFBMVEX///////////////////////////////////////////////////////////////9Or7hAAAAAEHRSTlMSRXr+lW3kiJSvOaJgUsnVWW443AAAADhJREFUCJljYMAHGJVNAsAMlvS2CWDGkg2cBlDJww4QmtcbooaByQYqw/IA3SD+CVAG8we8FjIAAHnyCBamEabFAAAAAElFTkSuQmCC"),
+			radial-gradient(#ff8951 7px, transparent 80%);
+}
+.help.gray {
+	filter:		grayscale(100%);
+}
+
+#receipt-lines-body .help {
+	margin:		0 0 0 1px;
+}
+
+div.popup {
+	display:	none;
+	position:	absolute;
+	z-index:	1100;
+
+	background-color:	#ffe;
+	padding:		6px;
+	font-size:		11pt;
+	max-width:		300px;
+
+	border:			2px solid #e88;
+	border-radius:		10px;
+	box-shadow:		6px 6px 4px 2px rgba(60,60,60,0.75);
+}
+div.popup-help::before {
+	content:		"HELP";
+	color:			#fff;
+	background-color:	#c33;
+	border-radius:		6px;
+
+	font-weight:		bold;
+	font-size:		8pt;
+	padding:		4px;
+	margin:			-2px 4px 0 0px;
+
+	display:		inline-block;
+	line-height:		100%;
+	vertical-align:		middle;
+}
+

@@ -1,0 +1,52 @@
+
+<@>権限確認
+<$ifredirect(! Auth.isadmin, myself)>
+
+<!--=========================================================================-->
+
+<$v.title="ユーザーの編集">
+
+<@call("_sub/menu_tree")>
+
+<!--=========================================================================-->
+
+<$local(h) = Auth.load_info(Query.id)>
+
+<$ifjump(Query.id eq ''             , '_sub/error_message', "IDが指定されていません")>
+<$ifjump(!defined h || !defined h.id, '_sub/error_message', "ID「<@Query.id>」がみつかりません")>
+
+<!--=========================================================================-->
+<article>
+<h2><@v.title></h2>
+<div class="body">
+	<form class="js-ajax" data-url="<@myself2><@v.skel_dir>">
+	<input type="hidden" name="action" value="user__ajax_edit">
+
+	<@call( v.skel_dir . '_form', h )>
+
+	<button type="button" data-href="<@myself2><@v.skel_dir>">戻る</button>
+	<button>保存する</button>
+	</form>
+
+	<form class="js-ajax js-check-form" data-url="<@myself2><@v.skel_dir>" data-confirm="このアカウントを削除しますか？" data-focus="cancel">
+		<input type="hidden" name="action" value="user__ajax_delete">
+		<input type="hidden" name="id" value="<@h.id>">
+	<@ifexec(Auth.id eq h.id, begin, begin)>
+		<button id="btn-delete" type="button" disabled>削除する</button>
+		<span class="note">自分のアカウントは削除できません。</span>
+	<$elsif(v.user__check_used(h.pkey))>
+		<button id="btn-delete" type="button" disabled>削除する</button>
+		<span class="note">このアカウントは使用済のため削除できません。代わりに「無効化」をしてください。</span>
+	<$else>
+		<button id="btn-delete" type="submit">削除する</button>
+	<$end>
+	</form>
+</div>
+</article>
+
+
+
+<@call(v.skel_dir . '_load_info', h.id)>
+
+<@call(v.skel_dir . '_load_logs', h.id)>
+

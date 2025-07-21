@@ -1,0 +1,32 @@
+
+<$v.title = "メニュー">
+<@call("_sub/menu_tree")>
+
+<#$DB.drop_table('document')>
+<#$v.db__init()>
+
+<$ifexec(!DB.find_table('client'))><$v.db__init()><$end>
+
+<!--=========================================================================-->
+<article>
+<h2><@v.title></h2>
+<div class="body">
+<ul class="main-menu">
+	<li><a href="<@myself2>document/">書類</a>	<@\>
+		・<a href="<@myself2>document/add">追加</a>	<@\>
+		（<a href="<@myself2>document/add_buy">購入</a>・<a href="<@myself2>document/add_sale">販売</a>）
+	</li>
+	<li><a href="<@myself2>document/pay">買掛</a>		<@\>
+		・<a href="<@myself2>document/receive">売掛</a>
+	</li>
+	<li><a href="<@myself2>client/">取引先</a>	<@\>
+		・<a href="<@myself2>client/add">追加</a>
+	</li>
+
+	<@ifexec(Auth.isadmin)>
+	<li><a href="<@myself2>log_search">ログ検索</a></li>
+	<li><a href="<@myself2>user/">ユーザー管理</a></li>
+	<$end>
+</ul>
+</div>
+</article>

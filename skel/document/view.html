@@ -1,0 +1,173 @@
+
+<$v.title ="書類の詳細表示">
+
+<$local(pkey) = int(Query.pkey)>
+<$local(h)    = v.load_document(pkey)>
+<$local(cl)   = h && v.load_client(h.c_pkey)>
+
+<$local(none)    = '&emsp;-'>
+<$local(backurl) = esc(Cookie.document_backurl) || "<@myself2><@v.skel_dir>">
+
+<!--=========================================================================-->
+
+<@call("_sub/menu_tree")>
+
+<$ifjump(!h, '_sub/error_message', '指定の書類がみつかりません。')>
+
+<!--=========================================================================-->
+<article>
+<h2><@v.title></h2>
+<div class="body view-box">
+
+	<div class="view-left">
+	<div class="table-container">
+	<table><tbody>
+	<tr>
+		<th class="w90">日付</th><td><@h.ymd></td>
+	</tr>
+	<tr>
+		<th>種別</th><td class="dtype-<@h.dtype>"><@h.dtype></td>
+	</tr>
+	<tr>
+		<th>書式</th><td class="dformat-<@h.dformat>"><@h.dformat></td>
+	</tr>
+	<tr>
+		<th>相手先</th>
+		<td>
+			<a id="client-link" target="_blank" href="<@myself2>client/view?pkey=<@h.c_pkey>"><@cl.name></a>
+		</td>
+	</tr>
+	<tr>
+		<th class="small">書類コード</th><td><@h.pcode></td>
+	</tr>
+	<tr>
+		<th>概要</th><td><@h.title></td>
+	</tr>
+	</tbody>
+
+	<tbody>
+	<tr>
+		<th colspan="2">金額</th>
+	</tr>
+	<tr>
+		<th>税抜</th><td class="r"><@v.printc(h.subtotal)></td>
+	</tr>
+	<tr>
+		<th>消費税</th><td class="r"><span class="tax-rate"><@h.tax_rate>%</span><@v.printc(h.tax)></td>
+	</tr>
+	<tr>
+		<th>総額</th><td class="r"><@v.printc(h.total)></td>
+	</tr>
+	<@ifexec(h.dformat eq v.dformat_invoice)>
+	<tr>
+		<th colspan="2">決済</th>
+	</tr>
+	<tr>
+		<th>決済額</th><td class="r"><span class="paid-ymd"><@h.paid_ymd></span> <@v.printc(h.paid)></td>
+	</tr>
+	<tr>
+		<th>残高</th><td class="r"><@v.printc(h.remain)></td>
+	</tr>
+	<$end>
+	<tr>
+		<th colspan="2">メモ</th>
+	</tr>
+	<tr>
+		<td colspan="2" class="memo"><@replace(h.memo, "\n", "<br>")></td>
+	</tr>
+	</tbody>
+
+	<tbody class="files" id="tbody-files">
+	<tr>
+		<th colspan="2" class="mw300">書類 <button type="button" id="check-files">改変チェック</button></th>
+	</tr>
+	<$local(files) = v.load_document_files(h)>
+	<@foreach(local(t), files)>
+	<tr>
+		<td colspan="2" class="file">
+			<input type="hidden" class="filename" name="files_ary" value="<@t>">
+			<a class="filepath" href="<@Basepath><@v.pub_dir><@t>"><@v.get_file_ext(t)>ファイル</a>
+			<span class="tamper-check"></span>
+		</td>
+	</tr>
+	<$end>
+	</tbody>
+	</table>
+	</div><!-- table-container -->
+
+	<form>
+		<button type="button" data-href="<@backurl>">戻る</button>
+		<button type="button" data-href="<@myself2><@v.skel_dir>edit?pkey=<@pkey>">編集する</button>
+	</form>
+	</div><!-- End of view left -->
+
+	<div class="view-right" id="view-file"></div>
+
+</div></article>
+
+<script type="module">
+$('#check-files').on('click', async function(evt){
+	const res = await asys.send_ajax({
+		data: {
+			action: '_ajax_tamper_check',
+			pkey:	<@pkey>
+		}
+	});
+	if (!res || res.ret !== 0) return;
+
+	const list = res.list;
+	const $tdlist = $('#tbody-files td.file');
+	for(const td of $tdlist) {
+		const $td  = $(td);
+		const file = $td.find('input.filename').val();
+		const $span= $td.find('span.tamper-check');
+
+		if (list[file]) {
+			$span.removeClass('fail');
+			$span.addClass('ok');
+			$span.text('正常');
+		} else {
+			$span.removeClass('ok');
+			$span.addClass('fail');
+			$span.text('エラー');
+		}
+	}
+});
+
+</script>
+<script type="module">
+	const $files = $('#tbody-files');
+	let $tdCurrentView;
+
+	// クリックしたファイルを表示
+	$files.on('click', 'td.file', async function(){
+		if (this.tagName != 'TD') return;
+		const $td = $(this);
+		const url = $td.find('a.filepath').attr('href');
+		if (!url) return;
+
+		if ($td.is($tdCurrentView)) return;
+		$tdCurrentView = $td;
+
+		const res = await fetch(url);
+
+		asys.view_file($('#view-file'), {
+			readAsDataURL: async function(){
+				const blob = await res.blob();
+				return URL.createObjectURL(blob);
+			},
+			readAsText: function(){
+				return res.text();
+			},
+			type: res.headers.get("Content-Type")
+		});
+	});
+
+	// 最初のファイルを自動表示
+	const $file = $files.find('td.file');
+	if ($file.length) $($file[0]).click();
+
+</script>
+
+
+<@call('_sub/load_logs', 'document', pkey)>

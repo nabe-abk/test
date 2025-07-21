@@ -1,0 +1,32 @@
+<$local(h)>
+
+<$h = if(argv#0 ne '', Auth.load_info(argv#0), Auth.ext)>
+
+<@>-----------------------------------------------------------------------------
+<article>
+<h2>ユーザー情報</h2>
+<div class="body">
+
+	<div class="table-container">
+	<table><tbody>
+	<tr>
+		<th>ID</th>
+		<td title="<@h.pkey>"><@h.id></td>
+	</tr>
+	<tr>
+		<th>ログイン回数</th>
+		<td><@h.login_c></td>
+	</tr>
+	<tr>
+		<th>最終ログイン日時</th>
+		<td><@h.login_tm></td>
+	</tr>
+	<tr>
+		<th>最終ログイン失敗日時</th>
+		<td><@h.fail_tm></td>
+	</tr>
+	</tbody></table>
+	</div><!-- table-container -->
+
+</div><!-- body -->
+</article>

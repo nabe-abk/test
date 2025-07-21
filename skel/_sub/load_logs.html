@@ -1,0 +1,49 @@
+<@7>
+<$local(names, logs, t)>
+
+<$logs  = v.load_logs(argv#0, argv#1, argv#2)>
+
+<@>-----------------------------------------------------------------------------
+<article>
+<h2 class="js-switch" data-target="div.log-table" data-delay="0">ログ（<@##logs+1>件）</h2>
+<div class="body">
+
+<@ifexec(@logs, begin)>
+	<div class="table-container">
+	<table class="log"><thead>
+	<tr>
+		<th>日時</th>
+		<th>名前</th>
+		<th>種類</th>
+		<th>内容</th>
+		<@ifexec(Auth.isadmin, begin)>
+		<th class="ip">IP</th>
+		<th class="host">HOST</th>
+		<$end>
+	</tr>
+	</thead>
+	<tbody>
+	<@foreach(t, logs)>
+	<tr>
+		<td class="date" title="<@t.pkey>"><@t.tm></td>
+		<td class="c" title="<@t.u_pkey>"><@t.name></td>
+		<td class="c logtype-<@t.type>"><@t.type></td>
+		<td class="log-msg"><@t.msg></td>
+		<@ifexec(Auth.isadmin, begin)>
+		<td class="ip"><@t.ip></td>
+		<td class="host"><@t.host></td>
+		<$end>
+	</tr>
+	<$end>
+	</tbody>
+	</table>
+	</div><!-- table-container -->
+
+	<@ifexec(Auth.isadmin, begin)>
+	<p><label><input type="checkbox" class="js-switch" data-delay="0" data-target="table.log .ip, table.log .host">IPアドレスを表示</label></p>
+	<$end>
+<$end>
+
+</div><!-- End of body -->
+</article>
+

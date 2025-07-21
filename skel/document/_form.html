@@ -1,0 +1,232 @@
+
+<$local(h)    = argv#0 || {}>
+<$local(edit) = h.pkey>
+<$local(cl)   = if(edit, v.load_client(h.c_pkey), {})>
+
+<$v.regist_js_module("<@v.script_dir>lib/pdf.mjs")>
+<$v.regist_js_module("<@v.script_dir>lib/sha256.min.js")>
+<$v.regist_js_module("<@v.script_dir>edit_document.js")>
+
+<div class="table-container">
+<table id="documents-form-table">
+	<tbody>
+	<tr>
+		<th>日付</th>
+		<td>
+			<input id="ymd" name="ymd" type="date" max="9999-12-31" value="<@h.ymd || v.get_today()>">
+			<select id="date-list" class="hide">
+			<optgroup id="date-list-optgroup" label="他の候補">
+			</optgroup>
+			</select>
+		<script type="module">
+			$('#date-list').on('change', function(){
+				const $sel = $(this);
+				$('#ymd').val($sel.val());
+			});
+		</script>
+		</tr>
+	<tr>
+		<th>種別</th>
+		<td>
+			<select id="dtype" name="dtype">
+				<option value="">（選択）</option>
+			<@foreach_keys(local(t), v.dtypes)>
+				<option class="dtype-<@t>" value="<@t>"<@if(t eq h.dtype, ' selected')>><@t></option>
+			<$end>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<th>書式</th>
+		<td>
+			<select id="dformat" name="dformat">
+				<option value="">（選択）</option>
+			<@foreach_keys(local(t), v.dformats)>
+				<option class="dformat-<@t>" value="<@t>"<@if(t eq h.dformat, ' selected')>><@t></option>
+			<$end>
+			</select>
+		<script type="module">
+			const $pay_inp = $('#tbody-pay input, #tbody-pay select, #tbody-pay button');
+			const $paid    = $('#paid');
+			const $remain  = $('#remain');
+
+			$('#dformat').on('change', function(){
+				const $sel = $(this);
+				if ($sel.val() == '<@v.dformat_invoice>') {
+					$pay_inp.prop('disabled', false);
+				} else {
+					$pay_inp.prop('disabled', true);
+					$paid.val(0);
+					$remain.val( $('#total').val() );
+				}
+			}).change();
+		</script>
+		</td>
+	</tr>
+	<tr>
+		<th>相手先</th>
+		<td>
+			<input id="c_pkey" type="hidden" name="c_pkey" value="<@h.c_pkey>" data-default="<@h.c_pkey>">
+			<a id="client-link" target="_blank" href="<@myself2>client/view?pkey=<@h.c_pkey>"><@cl.name></a>
+
+			<button type="button" class="select-client" data-url="<@myself2>client/select">選択</button>
+			<button type="button" class="select-client" data-url="<@myself2>client/select_new">新規</button>
+		<script type="module">
+			function make_client_param() {
+				let p='?_new=1';
+				const dtype = $('#dtype').val();
+				if (dtype === '購入') p+='&ctype=buy';
+				if (dtype === '販売') p+='&ctype=sale';
+				return p;
+			}
+
+			$('.select-client').on('click', function() {
+				const $obj = $(this);
+				const url  = $obj.data('url') + make_client_param();
+				const win  = window.open(url, '_blank', 'location=yes, menubar=no, resizable=yes, scrollbars=yes');
+				win.focus();
+			});
+
+			window.selected_client = function(data) {
+				const pkey = data.pkey;
+				$('#c_pkey').val(pkey);
+
+				const $a = $('#client-link');
+				$a.text( data.name );
+				$a.attr('href', '<@myself2>client/view?pkey=' + pkey);
+			}
+		</script>
+		</td>
+	</tr>
+	<tr>
+		<th class="small">書類コード</th>
+		<td>
+			<input id="pcode" type="text" class="w100p" name="pcode" value="<@h.pcode>">
+		</td>
+	</tr>
+	<tr>
+		<th>概要</th>
+		<td>
+			<input id="title" type="text" class="w100p" name="title" value="<@h.title>">
+		</td>
+	</tr>
+	</tbody>
+
+	<tbody>
+	<tr>
+		<th colspan="2">金額</th>
+	</tr>
+	<tr>
+		<th>税抜</th>
+		<td class="r">
+			<input type="text" class="w120 price" id="subtotal" name="subtotal" value="<@v.printc(h.subtotal || 0)>">
+		</td>
+	</tr>
+	<tr>
+		<th>消費税</th>
+		<td class="r">
+			<span class="tax-rate"><input type="number" class="w40 nospin" id="tax_rate" name="tax_rate" value="<@if(h.tax_rate ne '', h.tax_rate, v.default_tax_rate || 10)>" min="0" max="100">%</span>
+			<input type="text" class="w120 price" id="tax" name="tax" value="<@v.printc(h.tax || 0)>">
+		</td>
+	</tr>
+	<tr>
+		<th>総額</th>
+		<td class="r">
+			<span id="tax-warning" style="display: none" class="help" data-help="現在の総額に合う、正しい税額が設定できません。"></span>
+			<input type="text" class="w120 price" id="total" name="total" value="<@v.printc(h.total || 0)>">
+		</td>
+	</tr>
+	</tbody>
+
+	<tbody id="tbody-pay">
+	<tr>
+		<th colspan="2">決済</th>
+	</tr>
+	<tr>
+		<th>決済額</th>
+		<td class="r">
+			<input name="paid_ymd" type="date"  max="9999-12-31" value="<@h.paid_ymd || v.get_today()>">
+			<button type="button" id="pay-all">全額</button>	<@\>
+			<input type="text" class="w120 price" id="paid" name="paid" value="<@v.printc(h.paid || 0)>">
+		</td>
+	</tr>
+	<tr>
+		<th>残高</th>
+		<td class="r">
+			<input type="text" class="w120 price" id="remain" name="remain" value="<@v.printc(h.total - h.paid)>" readonly>
+		</td>
+	</tr>
+	</tbody>
+
+	<tbody>
+	<tr>
+		<th colspan="2">メモ</th>
+	</tr>
+	<tr>
+		<td colspan="2" class="memo">
+			<textarea name="memo_txt" rows="3" class="memo"><@esc(h.memo)></textarea>
+		</td>
+	</tr>
+	</tbody>
+
+	<tbody class="files" id="tbody-files" data-pkey="<@h.pkey>" data-viewbase="<@myself><@v.skel_dir>view?pkey=">
+	<tr>
+		<th colspan="2">書類（ファイル）</th>
+	</tr>
+	<tr class="nohover">
+		<td colspan="2">
+			<label><input class="js-save" id="auto-set-by-filename" type="checkbox">ファイル名から日付・書式を自動設定</label><br>
+			<label><input class="js-save" id="auto-set-by-content"  type="checkbox" checked>ファイルの中身から自動設定</label><span class="help" data-help="文字情報があるPDFかテキストファイルに対応。自動設定が間違っていないか、よくご確認ください。"></span>
+		</td>
+	</tr>
+	<$local(files) = v.load_document_files(h)>
+	<@foreach(local(t), files)>
+	<tr>
+		<td colspan="2" class="file">
+			<input type="hidden" name="files_ary" value="<@t>">
+			<a class="filepath" href="<@Basepath><@v.pub_dir><@t>"><@v.get_file_ext(t)>ファイル</a>
+			<button type="button" class="doc-file reset-file" data-target="#doc_file">クリア</button>
+			<div class="file-duplicate"><span class="msg">他データと重複してます</span><span class="file-duplicate-list"></span></div>
+		</td>
+	</tr>
+	<$end>
+	</tbody>
+	<tbody>
+	<tr id="upload-templates" class="hide">
+		<td colspan="2" class="file">
+			<img class="camera-thumbnail hide">
+			<input class="hide doc-file" id="doc_file" type="file" name="files_ary" accept=".<@join(',.', keys(v.allow_file_ext))>" value="" data-default="" data-target="#doc-file-filename">
+			<span class="doc-filename" id="doc-file-filename"></span>
+			<button type="button" class="doc-file js-file-btn"     data-target="#doc_file">選択</button>
+			<button type="button" class="doc-file reset-file hide" data-target="#doc_file">クリア</button>
+			<span class="camera-info">
+			<label class="camera-checkbox"><input name="enableCamera" class="js-save enableCamera" type="checkbox">カメラ</label>
+			<select name="camera-view-size" class="js-save camera-view-size">
+				<option value="1600,1200">4:3</option>
+				<option value="1200,1600">3:4</option>
+				<option value="1600,900">16:9</option>
+				<option value="900,1600">9:16</option>
+			</select>
+			</span>
+			<div class="file-duplicate"><span class="msg">他データと重複してます</span><span class="file-duplicate-list"></span></div>
+		</td>
+	</tr>
+	<tr id="camera-view-box" class="hide"><td colspan="2">
+		<canvas id="camera-view"></canvas>
+	</td></tr>
+	</tbody>
+</table>
+</div><!-- table-container -->
+
+<$G.ViewRight='<div class="view-right" id="view-file"></div>'>
+
+
+<div id="client-list" style="display: none">
+<@generate_json(local(x) = v.load_clients_for_match())>
+</div>
+
+<script type="module">
+	globalThis.dformatIntaxList = [ '<@join("','", v.dformat_intax_list || [])>' ];
+	globalThis.shutterSoundURL  = '<@Basepath><@v.pubdist_dir>shutter.ogg';
+</script>
+

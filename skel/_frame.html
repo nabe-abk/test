@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="<@SystemCode>">
+<meta name="viewport" content="width=device-width">
+<@>-----------------------------------------------------------------------------
+<link rel="stylesheet" href="<@Basepath><@v.theme_dir>asys.css?<@ get_lastmodified(v.theme_dir . 'asys.css')>">
+<link rel="stylesheet" href="<@Basepath><@v.theme_dir>theme.css?<@get_lastmodified(v.theme_dir . 'theme.css')>">
+<@>---JavaScript----------------------------------------------------------------
+<script type="module" src="<@Basepath><@v.script_dir>lib/jquery-3.7.1.min.js"></script>
+<@ifexec(DevelopJS, begin, begin)>
+<@_call("<@v.script_dir>lib/asys-js-load.html", v.script_dir . 'src/')>
+<$else>
+<script type="module" src="<@Basepath><@v.script_dir>lib/asys.min.js?<@get_lastmodified(v.script_dir . 'lib/asys.min.js')>"></script>
+<$end>
+<script type="module" src="<@Basepath><@v.script_dir>plogger.js?<@get_lastmodified(v.script_dir . 'plogger.js')>"></script>
+<@foreach(local(t), v.load_jscss('jsmod'), begin)>
+<script type="module" src="<@t>"></script>
+<$end>
+<@foreach(local(t), v.load_jscss('js'), begin)>
+<script defer src="<@t>"></script>
+<$end>
+<@>---Title---------------------------------------------------------------------
+	<title><@v.title> - <@v.systitle></title>
+</head>
+<body id="body" class="<@if(1<Develop, 'develop')>">
+
+<!--header====================================================================-->
+<header id="header">
+<@ifexec(Auth.ok, begin)>
+<@Auth.name><@if(Auth.isadmin, '（管理者）')>でログイン中&emsp;<a href="<@myself2>logout">ログアウト</a>
+<$end>
+</header>
+
+<@>-----------------------------------------------------------------------------
+<@> title
+<@>-----------------------------------------------------------------------------
+<h1><a href="<@myself>"><@v.systitle></a></h1>
+
+<@>-----------------------------------------------------------------------------
+<@> main
+<@>-----------------------------------------------------------------------------
+<!--main body================================================================-->
+<div id="main">
+<@argv#0>
+</div>
+
+<!--footer===================================================================-->
+<footer id="footer">
+<div><a href="https://github.com/nabe-abk/pdf-logger/">pdf-logger</a> Version <@v.VERSION> &copy;<a href="https://x.com/nabe_abk/">nabe@abk</a></div>
+</footer>
+
+
+<div style="display: none" id="asys-vars"><!--
+{
+	"myself":	"<@myself>",
+	"myself2":	"<@myself2>",
+	"Basepath":	"<@Basepath>"
+}
+--></div>
+
+
+<@ifexec(Develop && (@Error || @Debug), begin.debug)>
+<!--debug====================================================================-->
+<div class="main" id="debug-messages">
+<h2>debug</h2>
+
+<@ifexec(@Error, begin)>
+<div class="output-error">Error : <strong><@clear_error("\n")></strong></div>
+<$end>
+<@ifexec(@Debug, begin)>
+<div class="output-debug">Debug : <strong><@clear_debug("\n")></strong></div>
+<$end>
+</div>
+<$end.debug>
+
+</body>
+</html>

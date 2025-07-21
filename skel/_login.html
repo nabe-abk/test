@@ -1,0 +1,41 @@
+<@7>
+<$v.title ="ログイン">
+
+<@ifredirect(Auth.ok, "<@myself>")>
+
+<$ifexec(Auth.auto_login)><$Auth.init()><$end>
+
+<!--=========================================================================-->
+<article>
+<h2><@v.title></h2>
+<div class="body">
+	<form class="js-ajax" id="form" data-url="<@myself>">
+	<input type="hidden" name="action" value="_ajax_login">
+	<div class="table-container">
+	<table class="login">
+		<tbody>
+		<tr>
+		<th>ID</th><td><input type="text" class="w160 no-ime" name="id" id="id" value="" required></td>
+		</tr><tr>
+		<th>pass</th><td><input type="password" class="w160" id="pass" name="pass" value="" required></td>
+		</tr><tr>
+		<td colspan="2" class="button"><button type="submit">ログイン</button></td>
+		</tr>
+		</tbody>
+	</table>
+	</div><!-- table-container -->
+	</form>
+</div><!-- body -->
+</article>
+
+
+<@>-----------------------------------------------------------------------------
+<script type="module">
+	$('#id').focus();
+
+<$ifexec(Auth.allow_auto_login)>
+	$('#id').val('root');
+	$('#pass').val('dummy');
+	$('#form').attr('data-url', '<@myself2>user/add').submit();
+<$end>
+</script>
