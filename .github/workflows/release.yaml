@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Get Version String
-        run: echo "${{github.ref_name}}" | perl -e 'print "VERSION=" . <STDIN> =~ s/^.*?(\d+\.\d+(?:\.\d+)?\w*)/$1/r;' >> "$GITHUB_ENV"
+        run: echo "${{github.ref_name}}" | perl -e 'print "VERSION=" . (<STDIN> =~ /^.*?(\d+\.\d+(?:\.\d+)?\w*)/ ? $1 : "")' >> "$GITHUB_ENV"
 
       - name: Check Version
         run: |
