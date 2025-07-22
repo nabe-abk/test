@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Get release script
-        run: git clone --depth 1 https://github.com/nabe-abk/pdf-logger-release-tools
+        run: git clone --depth 1 https://github.com/nabe-abk/pdf-logger-release-tools __tools/
 
       - name: Run checker script
         run: __tools/checker.pl
