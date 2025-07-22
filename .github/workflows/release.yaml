@@ -15,6 +15,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Get release script
+        run: git clone --depth 1 https://github.com/nabe-abk/pdf-logger-release-tools
+
+      - name: Run checker script
+        run: __tools/checker.pl
+
       - name: Get Version String
         run: |
           echo "${{github.ref_name}}" | perl -e 'print "VERSION=" . (<STDIN> =~ /^.*?(\d+\.\d+(?:\.\d+)?\w*)/ ? $1 : "")' >> "$GITHUB_ENV"
@@ -27,7 +33,7 @@ jobs:
           fi
 
       - name: Build
-        run: __tool/release.sh
+        run: __tools/release.sh
 
       - name: Delete Release
         continue-on-error: true
