@@ -17,7 +17,6 @@ my %LogTbl = (
 #-------------------------------------------------------------------------------
 sub load_log_tbl_info {
 	my $self  = shift;
-	$self->debug();
 	return \%LogTbl;
 }
 
