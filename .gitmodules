@@ -1,0 +1,3 @@
+[submodule "lib/Sakia"]
+	path = lib/Sakia
+	url = git@github.com:nabe-abk/Sakia.git
